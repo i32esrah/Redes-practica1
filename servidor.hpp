@@ -174,3 +174,65 @@ int IntroducirUsuarioRegistrado(vector<struct jugadores> &vjugadores, int id, co
     }
 }
 
+bool IntroducirContraseña(vector<struct jugadores> &vjugadores, int id, const char *contrasena)
+{
+    for (int i = 0; i < vjugadores.size(); i++)
+    {
+        if (vjugadores[i].identificadorUsuario == id)
+        {
+            if (vjugadores[i].contraseña == string(contrasena))
+            {
+                vjugadores[i].estado = 2; // Conectado con la contraseña
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool RegistrarJugadorFichero(char *jugador, char *contrasena)
+{
+    FILE *fichero;
+    char linea[MSG_SIZE];
+    bool usuarioEncontrado = false;
+
+    fichero = fopen("usuarios.txt", "r");
+    if (fichero == NULL)
+    {
+        printf("Error al abrir el archivo.\n");
+        return false;
+    }
+
+    while (fgets(linea, MSG_SIZE, fichero) != NULL)
+    {
+        char usuarioArchivo[MSG_SIZE];
+        char contrasenaArchivo[MSG_SIZE];
+
+        sscanf(linea, "%s %s", usuarioArchivo, contrasenaArchivo);
+
+        if (strcmp(usuarioArchivo, jugador) == 0)
+        {
+            usuarioEncontrado = true;
+            break;
+        }
+    }
+
+    fclose(fichero);
+
+    if (usuarioEncontrado) // El nombre de usuario ya esta registrado en el fichero de texto
+    {
+        return false;
+    }
+
+    fichero = fopen("usuarios.txt", "a");
+    if (fichero == NULL)
+    {
+        printf("Error al abrir el archivo.\n");
+        return false;
+    }
+
+    fprintf(fichero, "%s %s\n", jugador, contrasena); // Escribir el nuevo usuario seguido de espacio y su contrasena
+
+    fclose(fichero);
+    return true;
+}
