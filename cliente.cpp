@@ -9,9 +9,8 @@
 #include <unistd.h>
 #include <time.h>
 #include <arpa/inet.h>
+#include "servidor.hpp"
 
-#define PORT 1865
-#define MSG_SIZE 200
 
 int main(){
 
