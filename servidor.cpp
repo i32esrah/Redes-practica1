@@ -31,17 +31,21 @@ int main ( )
 	struct sockaddr_in sockname, from;
 	char buffer[MSG_SIZE];
 	socklen_t from_len;
-    	fd_set readfds, auxfds;
-   	 int salida;
-   	 int arrayClientes[MAX_CLIENTS];
-    	int numClientes = 0;
-   	 //contadores
-    	int i,j,k;
-	int recibidos;
-   	 char identificador[MSG_SIZE];
-    
-    	int on, ret;
+    fd_set readfds, auxfds;
+   	int salida;
+   	int arrayClientes[MAX_CLIENTS];
+    int numClientes = 0;
 
+   	//contadores
+
+    int i,j,k;
+	int recibidos;
+
+   	char identificador[MSG_SIZE];
+    
+    int on, ret;
+
+    srand(time(NULL));
     
     
 	/* --------------------------------------------------
@@ -267,18 +271,136 @@ int main ( )
 
                                 } else if(strncmp(buffer, "PASSWORD ", strlen())){
                                     
-                                    sprintf(identificador,"<%d>: %s",i,buffer);
-                                    bzero(buffer,sizeof(buffer));
+                                    char contrasena[250];
+                                    sscanf(buffer, "PASSWORD %s", contrasena);
 
-                                    strcpy(buffer,identificador);
+                                    if( IntroducirContraseña(vjugadores, i, contraseña) == true ){ //Contraseña
+                                        bzero(buffer, sizeof(buffer));
+                                        sprintf(buffer, "+OK. Usuario validado");
+                                        send(i, buffer, sizeof(buffer), 0);
 
-                                    printf("%s\n", buffer);
+                                        printf("Cliente <%d> conectado con contraseña correctamente.\n", i);
+                                    } else {
+                                        bzero(buffer, sizeof(buffer));
+                                        sprintf(buffer, "-ERR. Error en la validacion");
+                                        send(i, buffer, sizeof(buffer), 0);
+                                    }
+                                
+                                } else if(strncmp(buffer, "REGISTRO ", strlen("REGISTRO ")) == 0) {
 
-                                    for(j=0; j<numClientes; j++)
-                                        if(arrayClientes[j] != i)
-                                            send(arrayClientes[j],buffer,sizeof(buffer),0);
+                                    char contrasena[250];
+                                    char usuario[250];
+                                    sscanf(buffer, "REGISTRO -u %s -p %s", usuario, contrasena);
 
-                                    
+                                    if( RegistrarJugadorFichero(usuario, contrasena) == true ){ //El usuario fue registrado
+                                        bzero(buffer, sizeof(buffer));
+                                        sprintf(buffer, "+OK. Usuario registrado correctamente");
+                                        send(i, buffer, sizeof(buffer), 0);
+
+                                        printf("Cliente <%d> registrado correctamente.\n", i);
+                                    } else {
+                                        bzero(buffer, sizeof(buffer));
+                                        sprintf(buffer, "-ERR. El nombre de usuario ya ha sido utilizado");
+                                        send(i, buffer, sizeof(buffer), 0);
+                                    }
+
+                                } else if( strncmp(buffer, "INICIAR-PARTIDA", strlen("INICIAR-PARTIDA")) == 0 ) {
+
+                                    bool conectado = false;
+                                    conectado = ConectadoConUsuarioYContrasña(vjugadores, i);
+
+                                    if(conectado) {
+                                        int aux, j, b;
+                                        
+                                        res = meterJugadorEnPartida(vjugadores, i, vpartidas, &j);
+
+                                        printf("Jugador <%d> buscando partida.\n", i);
+
+                                        if( res == 1 ) {
+                                            printf("Los jugadores <%d> y <%d> han encontrado partida.\n", i, j);
+
+                                            int num = rand() % (200 - 60 + 1) + 60;
+
+                                            bzero(buffer, sizeof(buffer));
+                                            sprintf(buffer, "+Ok. Empieza la partida. NÚMERO OBJETIVO: %d\n", num);
+                                            send(i, buffer, sizeof(buffer), 0);
+
+                                            bzero(buffer, sizeof(buffer));
+                                            sprintf(buffer, "+Ok. Empieza la partida. NÚMERO OBJETIVO: %d\n", num);
+                                            send(j, buffer, sizeof(buffer), 0);
+                                            
+                                            //Lógica de desarrollo de la partida
+
+                                        } else if(res == 2) {
+                                            
+                                            bzero(buffer, sizeof(buffer));
+                                            sprintf(buffer, "+Ok. Esperando otro jugador");
+                                            send(i, buffer, sizeof(buffer), 0);
+                                        } else if(res == 0) {
+
+                                            printf("Cliente <%d> ha dejado de buscar partida. Se ha alcanzado el máximo de clientes jugando simultáneamente.\n", i);
+
+                                            bzero(buffer, sizeof(buffer));
+                                            sprintf(buffer, "-ERR. Demasiados clientes jugando al BlackJack.");
+                                            send(i, buffer, sizeof(buffer), 0);
+                                        }
+                                    } else if (!conectado) {
+                                        bzero(buffer, sizeof(buffer));
+                                        sprintf(buffer, "-ERR. No puedes iniciar partida sin antes loguearte.");
+                                        send(i, buffer, sizeof(buffer), 0);
+                                    }
+                                } else if( strncmp(buffer, "TIRAR-DADOS", strlen("PEDIR-CARTA")) == 0 ){
+
+                                    bool conectado = false;
+                                    conectado = ConectadoConUsuarioYContraseña(vjugadores, i);
+
+                                    if (conectado) {
+                                        bool turnoJugador, plantadoJugador;
+                                        int estadoJugador = 0;
+
+                                        for(int a = 0; a < vjugadores.size(); a++) {
+                                            if( vjugadores[a].identificadorUsuario == i ){
+                                                estadoJugador = vjugadores[a].estado;
+                                                turnoJugador = vjugadores[a].turno;
+                                                plantadoJugador = vjugadores[a].plantado;
+                                            }
+                                        }
+
+                                        if (estadoJugador == 4) {
+                                            if (!plantadoJugador) {
+                                                if ( turnoJugador ) {
+                                                    int idbaraja = 0; idJugador2 = 0;
+                                                    bool plantadoJugador2;
+
+                                                    for( int h = 0; h < vpartidas.size(); h++ ) {
+
+                                                        if( vpartidas[h].jugador1.identificadorUsuario == i) {
+
+                                                            idbaraja = vpartidas[h].baraja.identificadorBaraja;
+                                                            idJugador2 = vpartidas[h].jugador2.identificadorUsuario;
+                                                            plantadoJugador2 = vpartidas[h].jugador2.plantado;
+
+                                                        } else if( vpartidas[h].jugador2.identificadorUsuario == i ) {
+
+                                                            idbaraja = vpartidas[h].baraja.identificadorBaraja;
+                                                            idJugador2 = vpartidas[h].jugador1.identificadorUsuario;
+                                                            plantadoJugador2 = vpartidas[h].jugador1.plantado;
+                                                        }
+
+                                                    }
+
+                                                    for(int l = 0; l < vjugadores.size(); l++) {
+                                                        if (vjugadores[l].identificadorUsuario == i) {
+                                                            
+                                                        }
+                                                    }
+
+
+                                                }
+                                            }
+                                        }
+                                    }
+
                                 }
                                                                 
                                 
