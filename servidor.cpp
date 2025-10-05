@@ -10,15 +10,14 @@
 #include <unistd.h>
 #include <time.h>
 #include <arpa/inet.h>
+#include "servidor.hpp"
 
 
-#define MSG_SIZE 250
-#define MAX_CLIENTS 20
-#define PORT 2000
 
 
-/*
- * El servidor ofrece el servicio de un chat
+
+/** 
+   El servidor ofrece el servicio de un chat
  */
 
 void manejador(int signum);
