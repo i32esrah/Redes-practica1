@@ -12,10 +12,6 @@
 #include <arpa/inet.h>
 #include "servidor.hpp"
 
-
-
-
-
 /** 
    El servidor ofrece el servicio de un chat
  */
@@ -232,11 +228,44 @@ int main ( )
                                         send(idJugador2, buffer, sizeof(buffer), 0);
 
                                         // Saca a los jugadores de la partida.
-                                        eliminaJugadoresPartida()
+                                        eliminaJugadoresPartida(vjugadores, i, idJugador2, vpartidas, vbaraja);
+                                    } else if ( estadoJugador == 3 ) {
+
+                                        eliminaJugador(vjugadores, i, vpartidas, vbaraja);
+
                                     }
+
+                                    salirCliente(i, &readfds, &numClientes, arrayClientes);
                                     
-                                }
-                                else{
+                                } else if(strncmp(buffer, "USUARIO", strlen("USUARIO ")) == 0 ) {
+
+                                    //Obtenemos el nombre del usuario
+                                    char jugador[250];
+                                    sscanf(buffer, "Usuario %s", jugador);
+                                    int introducirRes = IntroducirUsuarioRegistrado(vjugadores, i, jugador);
+
+                                    if( introducirRes == 1 ) {
+                                        bzero(buffer, sizeof(buffer));
+                                        sprintf(buffer, "+Ok. USUARIO correcto.");
+                                        send(i, buffer, sizeof(buffer), 0);
+
+                                        printf("Cliente <%d> conectado con usuario correctamente.\n", i);
+
+                                    } else if( introducirRes == 2 ) {
+                                        
+                                        bzero(buffer, sizeof(buffer));
+                                        sprintf(buffer, "-ERR. USUARIO incorrecto.");
+                                        send(i, buffer, sizeof(buffer), 0);
+
+                                    } else if( introducirRes == 3 ) {
+
+                                        bzero(buffer, sizeof(buffer));
+                                        sprintf(buffer, "-ERR. Demasiados clientes conectados.");
+                                        send(i, buffer, sizeof(buffer), 0);
+
+                                    }
+
+                                } else if(strncmp(buffer, "PASSWORD ", strlen())){
                                     
                                     sprintf(identificador,"<%d>: %s",i,buffer);
                                     bzero(buffer,sizeof(buffer));
