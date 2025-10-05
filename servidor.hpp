@@ -72,59 +72,39 @@ struct partidas
 
 #endif
 
-void eliminaJugadoresPartida(vector<struct jugadores> &vjugadores, int id1, int id2, vector<struct partidas> &vpartidas)
+bool ConectadoConUsuario(vector<struct jugadores> &vjugadores, int id, const char *jugador)
 {
-    for (int i = 0; i < vpartidas.size(); i++)
-    {
-        // Ambos jugadores están en la misma partida
-        if ((vpartidas[i].jugador1.identificadorUsuario == id1 && vpartidas[i].jugador2.identificadorUsuario == id2) ||
-            (vpartidas[i].jugador1.identificadorUsuario == id2 && vpartidas[i].jugador2.identificadorUsuario == id1))
-        {
-
-            vpartidas.erase(vpartidas.begin() + i); // Eliminamos la partida
-        }
-    }
-
-    // Eliminar a ambos jugadores del vector de jugadores
-    for (int i = 0; i < vjugadores.size();)
-    {
-        if (vjugadores[i].identificadorUsuario == id1 || vjugadores[i].identificadorUsuario == id2)
-        {
-            vjugadores.erase(vjugadores.begin() + i); // Eliminar el jugador
-        }
-        else
-        {
-            i++; // Incrementar si no se ha eliminado un jugador del vector
-        }
-    }
-}
-
-void eliminaJugador(vector<struct jugadores> &vjugadores, int id, vector<struct partidas> &vpartidas)
-{
-    // Elimino el vector de la partida
-    for (int i = 0; i < vpartidas.size(); i++)
-    {
-        if (vpartidas[i].jugador1.identificadorUsuario == id)
-        {
-            vpartidas.erase(vpartidas.begin() + i);
-        }
-
-        if (vpartidas[i].jugador2.identificadorUsuario == id)
-        {
-            vpartidas.erase(vpartidas.begin() + i);
-        }
-    }
-
-    // Elimino al jugador del vector jugadores
     for (int i = 0; i < vjugadores.size(); i++)
     {
-        if (vjugadores[i].identificadorUsuario == id)
+        if ((vjugadores[i].identificadorUsuario == id) && (strcmp(vjugadores[i].usuario.c_str(), jugador) == 0))
         {
-            vjugadores.erase(vjugadores.begin() + i);
+            return true;
         }
     }
+    return false;
 }
 
+
+bool ConectadoConUsuarioYContraseña(vector<jugadores> &vjugadores, int id)
+{
+    for (int i = 0; i < vjugadores.size(); i++)
+    {
+        if (vjugadores[i].identificadorUsuario == id && vjugadores[i].estado >= 2)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool comprobarConexiones(vector<struct jugadores> vjugadores, int id)
+{
+    if (vjugadores.size() < MAX_CLIENTS)
+    {
+        return true;
+    }
+    return false;
+}
 
 int IntroducirUsuarioRegistrado(vector<struct jugadores> &vjugadores, int id, const char *jugador)
 {
@@ -236,3 +216,125 @@ bool RegistrarJugadorFichero(char *jugador, char *contrasena)
     fclose(fichero);
     return true;
 }
+
+
+void eliminaJugadoresPartida(vector<struct jugadores> &vjugadores, int id1, int id2, vector<struct partidas> &vpartidas)
+{
+    for (int i = 0; i < vpartidas.size(); i++)
+    {
+        // Ambos jugadores están en la misma partida
+        if ((vpartidas[i].jugador1.identificadorUsuario == id1 && vpartidas[i].jugador2.identificadorUsuario == id2) ||
+            (vpartidas[i].jugador1.identificadorUsuario == id2 && vpartidas[i].jugador2.identificadorUsuario == id1))
+        {
+
+            vpartidas.erase(vpartidas.begin() + i); // Eliminamos la partida
+        }
+    }
+
+    // Eliminar a ambos jugadores del vector de jugadores
+    for (int i = 0; i < vjugadores.size();)
+    {
+        if (vjugadores[i].identificadorUsuario == id1 || vjugadores[i].identificadorUsuario == id2)
+        {
+            vjugadores.erase(vjugadores.begin() + i); // Eliminar el jugador
+        }
+        else
+        {
+            i++; // Incrementar si no se ha eliminado un jugador del vector
+        }
+    }
+}
+
+int meterJugadorEnPartida(vector<struct jugadores> &vjugadores, int id, vector<struct partidas> &vpartidas, int *id2)
+{
+    // Comprueba si hay un jugador esperando emparejamiento
+    for (int i = 0; i < vpartidas.size(); i++)
+    {
+        //Si solo hay un jugador esperando emparejamiento
+        if (vpartidas[i].jugador1.estado == 3 && vpartidas[i].jugador2.estado == 0)
+        {
+            for (int j = 0; j < vjugadores.size(); j++)
+            {
+                if (vjugadores[j].identificadorUsuario == id)
+                {
+
+                    vpartidas[i].jugador2 = vjugadores[j];
+                    vpartidas[i].jugador1.puntos = 0;
+                    vpartidas[i].jugador2.puntos = 0;
+
+
+
+                    // Cambiar el estado a jugando (4) del jugador 1
+                    for (int j2 = 0; j2 < vjugadores.size(); j2++)
+                    {
+                        if (vjugadores[j2].identificadorUsuario == vpartidas[i].jugador1.identificadorUsuario)
+                        {
+                            vjugadores[j2].estado = 4;
+                            (*id2) = vjugadores[j2].identificadorUsuario;
+                        }
+                    }
+
+                    // Cambiar el estado a jugando (4) y el identificador de la partida del jugador 2
+                    vjugadores[j].estado = 4;
+                    vjugadores[j].turno = false;
+                    vjugadores[j].plantado = false;
+                    vjugadores[j].identificadorPartida = i;
+                    return 1;
+                }
+            }
+        }
+    }
+    // Crea una nueva partida si hay menos de 10 partidas
+    if (vpartidas.size() < 10)
+    {
+        partidas p;
+        for (int j = 0; j < vjugadores.size(); j++)
+        {
+            if (vjugadores[j].identificadorUsuario == id)
+            {
+                vjugadores[j].estado = 3; // Cambiamos el estado del jugador a buscando partida
+                vjugadores[j].turno = true;
+                vjugadores[j].plantado = false;
+                vjugadores[j].identificadorPartida = vpartidas.size();
+                p.jugador1 = vjugadores[j];
+                p.jugador2.estado = 0;
+            }
+        }
+        vpartidas.push_back(p);
+        return 2;
+    }
+    return 0;
+}
+
+
+void eliminaJugador(vector<struct jugadores> &vjugadores, int id, vector<struct partidas> &vpartidas)
+{
+    // Elimino el vector de la partida
+    for (int i = 0; i < vpartidas.size(); i++)
+    {
+        if (vpartidas[i].jugador1.identificadorUsuario == id)
+        {
+            vpartidas.erase(vpartidas.begin() + i);
+        }
+
+        if (vpartidas[i].jugador2.identificadorUsuario == id)
+        {
+            vpartidas.erase(vpartidas.begin() + i);
+        }
+    }
+
+    // Elimino al jugador del vector jugadores
+    for (int i = 0; i < vjugadores.size(); i++)
+    {
+        if (vjugadores[i].identificadorUsuario == id)
+        {
+            vjugadores.erase(vjugadores.begin() + i);
+        }
+    }
+}
+
+
+
+
+
+
