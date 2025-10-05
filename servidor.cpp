@@ -200,11 +200,41 @@ int main ( )
                                 
                                 if(strcmp(buffer,"SALIR\n") == 0){
 
+
                                     int estadoJugador = 0;
 
-                                    for(int i = 0; a < vju)
-                                    
-                                    salirCliente(i,&readfds,&numClientes,arrayClientes);
+                                    for(int j = 0; j < vjugadores.size(); j++) {
+                                        
+                                        if(vjugadores[j].identificadorUsuario === i) {
+                                            estadoJugador = vjugadores[j].estado;
+                                        
+                                        }
+                                    }
+
+                                    if(estadoJugador == 4) {
+
+                                        int idJugador2 = 0;
+
+                                        for(int j = 0; j < vpartidas.size(); j++) {
+                                            if( vpartidas[j].jugador1.identificadorUsuario == i ){
+
+                                                idJugador2 = vpartidas[j].jugador2.identificadorUsuario;
+
+                                            } else if( vpartidas[j].jugador2.identificadorUsuario == i ) {
+
+                                                idJugador2 = vpartidas[j].jugador1.identificador;
+
+                                            }
+                                        }
+
+                                        // Alerta al otro usuario de que su rival ha abandonado la partida.
+                                        bzero(buffer, sizeof(buffer));
+                                        sprintf(buffer, "+Ok. Tu oponente ha terminado la partida");
+                                        send(idJugador2, buffer, sizeof(buffer), 0);
+
+                                        // Saca a los jugadores de la partida.
+                                        eliminaJugadoresPartida()
+                                    }
                                     
                                 }
                                 else{
