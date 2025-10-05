@@ -138,21 +138,15 @@ int main ( )
                                     FD_SET(new_sd,&readfds);
                                 
                                     strcpy(buffer, "+Ok. Usuario conectado.\n");
-                                
-                                    send(new_sd,buffer,sizeof(buffer),0);
 
-                                    recibidos = recv(i, buffer, sizeof(buffer), 0);
-
-                                    if(recibidos > 0){
-                                        //Hacer funcion que convierta el mensaje en un vector de cadenas.
-                                    }
+                                    printf("Cliente <%d> conectado.\n", new_sd);
                                 
-                                    for(j=0; j<(numClientes-1);j++){
-                                    
-                                        bzero(buffer,sizeof(buffer));
-                                        sprintf(buffer, "Nuevo Cliente conectado en <%d>",new_sd);
-                                        send(arrayClientes[j],buffer,sizeof(buffer),0);
-                                    }
+                                    send(new_sd, buffer, sizeof(buffer), 0);
+
+                                    bzero(buffer, sizeof(buffer), 0);
+                                    sprintf(buffer, "------------------ OPCIONES ------------------\nUSUARIO usuario\nPASSWORD contraseña\nREGISTRO -u usuario -p contraseña\nINICIAR-PARTIDA\nPEDIR-CARTA\nPLANTARME\nSALIR\n----------------------------------------------\n");
+                                    send(new_sd, buffer, sizeof(buffer), 0);
+                                    close(new_sd);
                                 }
                                 else
                                 {
@@ -167,22 +161,28 @@ int main ( )
                             
                         }
                         else if (i == 0){
+
+                            /* APAGAR SERVIDOR */
+
                             //Se ha introducido información de teclado
                             bzero(buffer, sizeof(buffer));
                             fgets(buffer, sizeof(buffer),stdin);
                             
                             //Controlar si se ha introducido "SALIR", cerrando todos los sockets y finalmente saliendo del servidor. (implementar)
                             if(strcmp(buffer,"SALIR\n") == 0){
+
+                                bzero(buffer, sizeof(buffer));
+						        strcpy(buffer,"Desconexión servidor\n");
                              
                                 for (j = 0; j < numClientes; j++){
-						            bzero(buffer, sizeof(buffer));
-						            strcpy(buffer,"Desconexión servidor\n"); 
+						            
                                     send(arrayClientes[j],buffer , sizeof(buffer),0);
-                                    close(arrayClientes[j]);
-                                    FD_CLR(arrayClientes[j],&readfds);
+                                    salirCliente(arrayClientes[j], &readfds, &numClientes, arrayClientes);
                                 }
-                                    close(sd);
-                                    exit(-1);
+                                
+                                printf("Servidor apagado.\n");
+                                close(sd);
+                                exit(-1);
                                 
                                 
                             }
@@ -195,8 +195,14 @@ int main ( )
                             recibidos = recv(i,buffer,sizeof(buffer),0);
                             
                             if(recibidos > 0){
+
+                                /* SALIDA DEL CLIENTE */
                                 
                                 if(strcmp(buffer,"SALIR\n") == 0){
+
+                                    int estadoJugador = 0;
+
+                                    for(int i = 0; a < vju)
                                     
                                     salirCliente(i,&readfds,&numClientes,arrayClientes);
                                     
@@ -239,6 +245,8 @@ int main ( )
 
 void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClientes[]){
   
+    printf("Socket de cliente <%d> desconectado.\n", socket);
+
     char buffer[250];
     int j;
     
@@ -253,14 +261,6 @@ void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClie
         (arrayClientes[j] = arrayClientes[j+1]);
     
     (*numClientes)--;
-    
-    bzero(buffer,sizeof(buffer));
-    sprintf(buffer,"Desconexión del cliente <%d>",socket);
-    
-    for(j=0; j<(*numClientes); j++)
-        if(arrayClientes[j] != socket)
-            send(arrayClientes[j],buffer,sizeof(buffer),0);
-
 
 }
 
