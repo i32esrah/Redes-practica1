@@ -145,8 +145,8 @@ int main ( )
                                 
                                     send(new_sd, buffer, sizeof(buffer), 0);
 
-                                    bzero(buffer, sizeof(buffer), 0);
-                                    sprintf(buffer, "------------------ OPCIONES ------------------\nUSUARIO usuario\nPASSWORD contraseña\nREGISTRO -u usuario -p contraseña\nINICIAR-PARTIDA\nPEDIR-CARTA\nPLANTARME\nSALIR\n----------------------------------------------\n");
+                                    bzero(buffer, sizeof(buffer));
+                                    sprintf(buffer, "------------------ OPCIONES ------------------\nUSUARIO usuario\nPASSWORD contraseña\nREGISTRO -u usuario -p contraseña\nINICIAR-PARTIDA\nTIRAR-DADOS\nNO-TIRAR-DADOS\nPLANTARME\nSALIR\n----------------------------------------------\n");
                                     send(new_sd, buffer, sizeof(buffer), 0);
                                     close(new_sd);
                                 }
@@ -207,7 +207,7 @@ int main ( )
 
                                     for(int j = 0; j < vjugadores.size(); j++) {
                                         
-                                        if(vjugadores[j].identificadorUsuario === i) {
+                                        if(vjugadores[j].identificadorUsuario == i) {
                                             estadoJugador = vjugadores[j].estado;
                                         
                                         }
@@ -235,10 +235,10 @@ int main ( )
                                         send(idJugador2, buffer, sizeof(buffer), 0);
 
                                         // Saca a los jugadores de la partida.
-                                        eliminaJugadoresPartida(vjugadores, i, idJugador2, vpartidas, vbaraja);
+                                        eliminaJugadoresPartida(vjugadores, i, idJugador2, vpartidas);
                                     } else if ( estadoJugador == 3 ) {
 
-                                        eliminaJugador(vjugadores, i, vpartidas, vbaraja);
+                                        eliminaJugador(vjugadores, i, vpartidas);
 
                                     }
 
@@ -272,7 +272,7 @@ int main ( )
 
                                     }
 
-                                } else if(strncmp(buffer, "PASSWORD ", strlen())){
+                                } else if(strncmp(buffer, "PASSWORD ", strlen("PASSWORD "))){
                                     
                                     char contrasena[250];
                                     sscanf(buffer, "PASSWORD %s", contrasena);
@@ -430,7 +430,7 @@ int main ( )
 
                                                                     for (int a = 0; a < vjugadores.size(); a++) {
                                                                         
-                                                                        else if (vjugadores[a].identificadorUsuario == idJugador2) // El jugador 2 puede seguir jugando
+                                                                        if (vjugadores[a].identificadorUsuario == idJugador2) // El jugador 2 puede seguir jugando
                                                                         {
 
                                                                             if(!plantadoJugador2) {
@@ -478,7 +478,7 @@ int main ( )
 
                                                                     for (int a = 0; a < vjugadores.size(); a++) {
                                                                         
-                                                                        else if (vjugadores[a].identificadorUsuario == idJugador2) // El jugador 2 puede seguir jugando
+                                                                        if (vjugadores[a].identificadorUsuario == idJugador2) // El jugador 2 puede seguir jugando
                                                                         {
 
                                                                             if(!plantadoJugador2) {
@@ -633,16 +633,204 @@ int main ( )
                                         send(i, buffer, sizeof(buffer), 0);
                                     }
 
-                                } 
+                                } else if(strncmp(buffer, "PLANTARME", strlen("PLANTARME")) == 0) {
+
+                                    bool conectado = false;
+                                    conectado = ConectadoConUsuarioYContraseña(vjugadores, i);
+
+                                    if (conectado) {
+                                        int estadoJugador = 0;
+
+                                        for (int a = 0; a < vjugadores.size(); a++) {
+                                            if(vjugadores[a].identificarUsuario == i) {
+                                                estadoJugador = vjugadores[a].estado;
+                                            }
+                                        }
+
+                                        if (estadoJugador == 4) {
+                                            int idJugador2 = 0, objetivo = 0;
+
+                                            for (int h = 0; h < vpartidas.size(); h++) {
+                                                if (vpartidas[h].jugador1.identificadorUsuario == i) {
+                                                    idJugador2 = vpartidas[h].jugador2.identificadorUsuario;
+                                                    objetivo = vpartidas[h].objetivo;
+                                                }
+                                                else if (vpartidas[h].jugador2.identificadorUsuario == i) {
+                                                    idJugador2 = vpartidas[h].jugador1.identificadorUsuario;
+                                                    objetivo = vpartidas[h].objetivo;
+                                                }
+                                            }
+
+                                            // Cambia el jugador a plantado y otorga el turno del otro jugador
+                                            for (int a = 0; a < vjugadores.size(); a++) {
+                                                if (vjugadores[a].identificadorUsuario == i) // El jugador 1 se planta
+                                                {
+                                                    vjugadores[a].plantado = true;
+                                                    vjugadores[a].turno = false;
+
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "+Ok. Te has plantado.");
+                                                    send(i, buffer, sizeof(buffer), 0);
+                                                }
+                                                else if (vjugadores[a].identificadorUsuario == idJugador2) // El jugador 2 puede seguir jugando
+                                                {
+                                                    vjugadores[a].turno = true;
+                                                }
+                                            }
+
+                                            int aux = 0;
+                                            for (int a = 0; a < vjugadores.size(); a++) {
+                                                if ((vjugadores[a].identificadorUsuario == i) && (vjugadores[a].plantado))
+                                                    aux++;
+
+                                                else if ((vjugadores[a].identificadorUsuario == idJugador2) && (vjugadores[a].plantado))
+                                                    aux++;
+                                            }
+
+                                            if (aux == 1) { // Solo se ha plantado 1 jugador
+                                                bzero(buffer, sizeof(buffer));
+                                                sprintf(buffer, "+Ok. Esperando que finalice el otro jugador");
+                                                send(i, buffer, sizeof(buffer), 0);
+                                            } else if (aux == 2) {
+                                                int puntosJugador1 = 0, puntosJugador2 = 0;
+                                                string usuario1, usuario2;
+
+                                                for (int a = 0; a < vjugadores.size(); a++) {
+                                                    if (vjugadores[a].identificadorUsuario == i)
+                                                    {
+                                                        puntosJugador1 = vjugadores[a].puntos;
+                                                        usuario1 = vjugadores[a].usuario;
+                                                    }
+                                                    else if (vjugadores[a].identificadorUsuario == idJugador2)
+                                                    {
+                                                        puntosJugador2 = vjugadores[a].puntos;
+                                                        usuario2 = vjugadores[a].usuario;
+                                                    }
+                                                }
+
+                                                // Han empatado los jugadores
+                                                if ((puntosJugador1 == puntosJugador2) && (puntosJugador1 <= objetivo)) {
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "+Ok. Jugador %s y Jugador %s habéis empatado la partida", usuario1.c_str(), usuario2.c_str());
+                                                    send(i, buffer, sizeof(buffer), 0);
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "+Ok. Jugador %s y Jugador %s habéis empatado la partida", usuario1.c_str(), usuario2.c_str());
+                                                    send(idJugador2, buffer, sizeof(buffer), 0);
+                                                }
+                                                // Jugador 2 ha ganado la partida
+                                                else if ((puntosJugador1 < puntosJugador2) && (puntosJugador1 <= objetivo) && (puntosJugador2 <= objetivo))
+                                                {
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida", usuario2.c_str());
+                                                    send(i, buffer, sizeof(buffer), 0);
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida", usuario2.c_str());
+                                                    send(idJugador2, buffer, sizeof(buffer), 0);
+                                                }
+                                                // Jugador 1 ha ganado la partida
+                                                else if ((puntosJugador1 > puntosJugador2) && (puntosJugador1 <= objetivo) && (puntosJugador2 <= objetivo))
+                                                {
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida", usuario1.c_str());
+                                                    send(i, buffer, sizeof(buffer), 0);
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida", usuario1.c_str());
+                                                    send(idJugador2, buffer, sizeof(buffer), 0);
+                                                }
+                                                // Jugador 2 ha superado el objetivo
+                                                else if ((puntosJugador1 <= objetivo) && (puntosJugador2 > objetivo))
+                                                {
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida", usuario1.c_str());
+                                                    send(i, buffer, sizeof(buffer), 0);
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida", usuario1.c_str());
+                                                    send(idJugador2, buffer, sizeof(buffer), 0);
+                                                }
+                                                // Jugador 1 ha superado el objetivo
+                                                else if ((puntosJugador1 > objetivo) && (puntosJugador2 <= objetivo))
+                                                {
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida", usuario2.c_str());
+                                                    send(i, buffer, sizeof(buffer), 0);
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida", usuario2.c_str());
+                                                    send(idJugador2, buffer, sizeof(buffer), 0);
+                                                }
+                                                // Ninguno ha ganado
+                                                else if ((puntosJugador1 > objetivo) && (puntosJugador2 > objetivo))
+                                                {
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "+Ok. No hay ganadores");
+                                                    send(i, buffer, sizeof(buffer), 0);
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "+Ok. No hay ganadores");
+                                                    send(idJugador2, buffer, sizeof(buffer), 0);
+                                                }
+
+                                                // Elimina a ambos jugadores de la partida
+                                                eliminaJugadoresPartida(vjugadores, i, idJugador2, vpartidas);
+                                            }
+                                        } else { // El jugador no está en partida
+                                            bzero(buffer, sizeof(buffer));
+                                            sprintf(buffer, "-ERR. No puedes plantarte sin antes iniciar partida.");
+                                            send(i, buffer, sizeof(buffer), 0);
+                                        }
+                                    } else { // El Jugador no está logueado
+                                        bzero(buffer, sizeof(buffer));
+                                        sprintf(buffer, "-ERR. No puedes plantarte sin antes iniciar partida.");
+                                        send(i, buffer, sizeof(buffer), 0);
+                                    }
+
+                                } else {
+                                    bzero(buffer, sizeof(buffer));
+                                    sprintf(buffer, "-ERR. No se permite enviar este mensaje");
+                                    send(i, buffer, sizeof(buffer), 0);
+                                }
                                                                 
                                 
                             }
-                            //Si el cliente introdujo ctrl+c
+                            //Cliente manda señal SIGINT (Ctrl + c)
                             if(recibidos== 0)
                             {
-                                printf("El socket %d, ha introducido ctrl+c\n", i);
-                                //Eliminar ese socket
-                                salirCliente(i,&readfds,&numClientes,arrayClientes);
+                                int estadoJugador = 0;
+
+                                for (int a = 0; a < vjugadores.size(); a++) {
+                                    if (vjugadores[a].identificadorUsuario == i)
+                                    {
+                                        estadoJugador = vjugadores[a].estado;
+                                    }
+                                }
+
+                                if (estadoJugador == 4) {
+
+                                    int idJugador2 = 0;
+                                    for (int h = 0; h < vpartidas.size(); h++)
+                                    {
+                                        if (vpartidas[h].jugador1.identificadorUsuario == i)
+                                        {
+                                            idJugador2 = vpartidas[h].jugador2.identificadorUsuario;
+                                        }
+                                        else if (vpartidas[h].jugador2.identificadorUsuario == i)
+                                        {
+                                            idJugador2 = vpartidas[h].jugador1.identificadorUsuario;
+                                        }
+                                    }
+                                    // Avisa al otro jugador de que se ha salido de la partida
+                                    bzero(buffer, sizeof(buffer));
+                                    sprintf(buffer, "+Ok. Tu oponente ha terminado la partida");
+                                    send(idJugador2, buffer, sizeof(buffer), 0);
+
+                                    // Elimina a ambos jugadores de la partida
+                                    eliminaJugadoresPartida(vjugadores, i, idJugador2, vpartidas);
+                                }
+                                else if (estadoJugador == 3)
+                                {
+                                    // Elimina al jugador de la lista de espera
+                                    eliminaJugador(vjugadores, i, vpartidas);
+                                }
+
+                                salirCliente(i, &readfds, &numClientes, arrayClientes);
                             }
                         }
                     }
@@ -678,8 +866,7 @@ void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClie
 
 
 void manejador (int signum){
-    printf("\nSe ha recibido la señal de salida\n");
+    printf("\n-ERR. Se ha recibido la señal sigint. Para apagar el servidor introduzca SALIR.\n");
     signal(SIGINT,manejador);
     
-    //Implementar lo que se desee realizar cuando ocurra la excepción de ctrl+c en el servidor
 }
