@@ -334,18 +334,10 @@ void eliminaJugador(vector<struct jugadores> &vjugadores, int id, vector<struct 
     }
 }
 
-int tirarDados(int ndados){
+int tirarDados(){
 
     srand(time(NULL));
-    if(ndados == 1){
-
-        return 1 + rand() % 6;
-    }
-    else if(ndados == 2){
-        int numero1 = 1 + rand() % 6;
-        int numero2 = 1 + rand() % 6;
-        return numero1 + numero2;
-    }
+    return 1 + rand() % 6;
 
 }
 
