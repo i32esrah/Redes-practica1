@@ -418,6 +418,39 @@ int main ( )
                                                                     sprintf(buffer, "+Ok.[<TIRADA DEL RIVAL>, <%d>; <PUNTUACIÓN TOTAL DEL RIVAL>, <%d>]", n1 + n2, puntosJugador);
                                                                     send(idJugador2, buffer, sizeof(buffer), 0);
 
+                                                                        
+                                                                    if(!plantadoJugador2){
+
+                                                                        vjugadores[l].turno = false;
+                                                                    }
+
+                                                                    bzero(buffer, sizeof(buffer));
+                                                                    sprintf(buffer, "+Ok. Has perdido el turno.");
+                                                                    send(i, buffer, sizeof(buffer), 0);
+
+                                                                    for (int a = 0; a < vjugadores.size(); a++) {
+                                                                        
+                                                                        else if (vjugadores[a].identificadorUsuario == idJugador2) // El jugador 2 puede seguir jugando
+                                                                        {
+
+                                                                            if(!plantadoJugador2) {
+
+                                                                                vjugadores[a].turno = true;
+                                                                                
+                                                                                bzero(buffer, sizeof(buffer));
+                                                                                sprintf(buffer, "+Ok. Es tu turno.");
+                                                                                send(idJugador2, buffer, sizeof(buffer), 0);
+                                                                            } else {
+                                                                                
+                                                                                bzero(buffer, sizeof(buffer));
+                                                                                sprintf(buffer, "+Ok. Es tu turno, el jugador contrario está plantado.");
+                                                                                send(i, buffer, sizeof(buffer), 0);
+                                                                            }
+                                                                        }
+                                                                    }
+
+
+
                                                                 } else if (tiradas == 1){
 
                                                                     int n1 = tirarDados();
@@ -433,6 +466,36 @@ int main ( )
                                                                     bzero(buffer, sizeof(buffer));
                                                                     sprintf(buffer, "+Ok.[<TIRADA DEL RIVAL>, <%d>; <PUNTUACIÓN TOTAL DEL RIVAL>, <%d>]", n1, puntosJugador);
                                                                     send(idJugador2, buffer, sizeof(buffer), 0);
+
+                                                                    if(!plantadoJugador2){
+
+                                                                        vjugadores[l].turno = false;
+                                                                    }
+
+                                                                    bzero(buffer, sizeof(buffer));
+                                                                    sprintf(buffer, "+Ok. Has perdido el turno.");
+                                                                    send(i, buffer, sizeof(buffer), 0);
+
+                                                                    for (int a = 0; a < vjugadores.size(); a++) {
+                                                                        
+                                                                        else if (vjugadores[a].identificadorUsuario == idJugador2) // El jugador 2 puede seguir jugando
+                                                                        {
+
+                                                                            if(!plantadoJugador2) {
+
+                                                                                vjugadores[a].turno = true;
+                                                                                
+                                                                                bzero(buffer, sizeof(buffer));
+                                                                                sprintf(buffer, "+Ok. Es tu turno.");
+                                                                                send(idJugador2, buffer, sizeof(buffer), 0);
+                                                                            } else {
+                                                                                
+                                                                                bzero(buffer, sizeof(buffer));
+                                                                                sprintf(buffer, "+Ok. Es tu turno, el jugador contrario está plantado.");
+                                                                                send(i, buffer, sizeof(buffer), 0);
+                                                                            }
+                                                                        }
+                                                                    }
 
                                                                 } else {
                                                                     bzero(buffer, sizeof(buffer));
