@@ -262,6 +262,10 @@ int meterJugadorEnPartida(vector<struct jugadores> &vjugadores, int id, vector<s
                     vpartidas[i].jugador2 = vjugadores[j];
                     vpartidas[i].jugador1.puntos = 0;
                     vpartidas[i].jugador2.puntos = 0;
+                    vpartidas[i].jugador1.contadorNoTirarDados = 0;
+                    vpartidas[i].jugador2.contadorNoTirarDados = 0;
+                    vpartidas[i].jugador2.plantado = false;
+                    vpartidas[i].jugador2.turno = false;
                     vpartidas[i].objetivo = obj;
 
 
@@ -278,8 +282,6 @@ int meterJugadorEnPartida(vector<struct jugadores> &vjugadores, int id, vector<s
 
                     // Cambiar el estado a jugando (4) y el identificador de la partida del jugador 2
                     vjugadores[j].estado = 4;
-                    vjugadores[j].turno = false;
-                    vjugadores[j].plantado = false;
                     vjugadores[j].identificadorPartida = i;
                     return 1;
                 }
