@@ -47,6 +47,7 @@ struct jugadores
     bool turno;
     int estado;
     int puntos;
+    int contadorNoTirarDados;
     bool plantado;
     int identificadorPartida;
     int identificadorUsuario;
