@@ -41,6 +41,9 @@ int main ( )
     int i,j,k;
 	int recibidos;
 
+    vector<struct jugadores> vjugadores;
+    vector<struct partidas> vpartidas;
+
    	char identificador[MSG_SIZE];
     
     int on, ret;
@@ -311,15 +314,15 @@ int main ( )
 
                                     if(conectado) {
                                         int aux, j, b;
+
+                                        int num = rand() % (200 - 60 + 1) + 60;
                                         
-                                        res = meterJugadorEnPartida(vjugadores, i, vpartidas, &j);
+                                        res = meterJugadorEnPartida(vjugadores, i, vpartidas, &j, num);
 
                                         printf("Jugador <%d> buscando partida.\n", i);
 
                                         if( res == 1 ) {
                                             printf("Los jugadores <%d> y <%d> han encontrado partida.\n", i, j);
-
-                                            int num = rand() % (200 - 60 + 1) + 60;
 
                                             bzero(buffer, sizeof(buffer));
                                             sprintf(buffer, "+Ok. Empieza la partida. NÚMERO OBJETIVO: %d\n", num);
@@ -328,8 +331,6 @@ int main ( )
                                             bzero(buffer, sizeof(buffer));
                                             sprintf(buffer, "+Ok. Empieza la partida. NÚMERO OBJETIVO: %d\n", num);
                                             send(j, buffer, sizeof(buffer), 0);
-                                            
-                                            //Lógica de desarrollo de la partida
 
                                         } else if(res == 2) {
                                             
@@ -349,7 +350,7 @@ int main ( )
                                         sprintf(buffer, "-ERR. No puedes iniciar partida sin antes loguearte.");
                                         send(i, buffer, sizeof(buffer), 0);
                                     }
-                                } else if( strncmp(buffer, "TIRAR-DADOS", strlen("PEDIR-CARTA")) == 0 ){
+                                } else if( strncmp(buffer, "TIRAR-DADOS", strlen("TIRAR-DADOS")) == 0 ){
 
                                     bool conectado = false;
                                     conectado = ConectadoConUsuarioYContraseña(vjugadores, i);

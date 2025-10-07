@@ -245,7 +245,7 @@ void eliminaJugadoresPartida(vector<struct jugadores> &vjugadores, int id1, int 
     }
 }
 
-int meterJugadorEnPartida(vector<struct jugadores> &vjugadores, int id, vector<struct partidas> &vpartidas, int *id2)
+int meterJugadorEnPartida(vector<struct jugadores> &vjugadores, int id, vector<struct partidas> &vpartidas, int *id2, int obj)
 {
     // Comprueba si hay un jugador esperando emparejamiento
     for (int i = 0; i < vpartidas.size(); i++)
@@ -261,6 +261,7 @@ int meterJugadorEnPartida(vector<struct jugadores> &vjugadores, int id, vector<s
                     vpartidas[i].jugador2 = vjugadores[j];
                     vpartidas[i].jugador1.puntos = 0;
                     vpartidas[i].jugador2.puntos = 0;
+                    vpartidas[i].objetivo = obj;
 
 
 
