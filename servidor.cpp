@@ -478,7 +478,61 @@ int main ( )
                                 } else if (strncmp(buffer, "NO-TIRAR-DADOS", strlen("NO-TIRAR-DADOS")) == 0){
 
                                     bool conectado = false;
-                                    conectado = ConectadoConUsuarioY
+                                    conectado = ConectadoConUsuarioYContraseña(vjugadores, i);
+
+                                    if( conectado ) {
+                                        int estadoJugador = 0;
+
+                                        for (int a = 0; a < vjugadores.size(); a++) {
+                                            if (vjugadores[a].identificadorUsuario == i) {
+
+                                                estadoJugador = vjugadores[a].estado;
+                                            }
+                                        }
+
+                                        if (estadoJugador == 4){
+                                            int idJugador2 = 0;
+                                            for (int h = 0; h < vpartidas.size(); h++) {
+                                                if (vpartidas[h].jugador1.identificadorUsuario == i) {
+
+                                                    idJugador2 = vpartidas[h].jugador2.identificadorUsuario;
+                                                }
+                                                else if (vpartidas[h].jugador2.identificadorUsuario == i) {
+
+                                                    idJugador2 = vpartidas[h].jugador1.identificadorUsuario;
+                                                }
+                                            }
+
+                                            for (int a = 0; a < vjugadores.size(); a++) {
+                                                if (vjugadores[a].identificadorUsuario == i) { // El jugador no tira dados y pierde turno
+                                                
+                                                    vjugadores[a].turno = false;
+
+                                                    vjugadores[a].contadorNoTirarDados++;
+                                                    
+                                                    int noTirarDados =  vjugadores[a].contadorNoTirarDados;
+
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "+Ok. No has tirado dados (%d/3). Has perdido el turno.", noTirarDados);
+                                                    send(i, buffer, sizeof(buffer), 0);
+                                                }
+                                                else if (vjugadores[a].identificadorUsuario == idJugador2) // El jugador 2 puede seguir jugando
+                                                {
+
+                                                    if(!vjugadores[a].plantado) {
+
+                                                        vjugadores[a].turno = true;
+                                                        
+                                                        bzero(buffer, sizeof(buffer));
+                                                        sprintf(buffer, "+Ok. Es tu turno, el jugador contrario ha decidido no tirar dados.");
+                                                        send(idJugador2, buffer, sizeof(buffer), 0);
+                                                    } else {
+                                                        
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
 
                                 }
                                                                 
