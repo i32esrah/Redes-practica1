@@ -272,7 +272,7 @@ int main ( )
 
                                     }
 
-                                } else if(strncmp(buffer, "PASSWORD ", strlen("PASSWORD "))){
+                                } else if(strncmp(buffer, "PASSWORD ", strlen("PASSWORD ")) == 0){
                                     
                                     char contrasena[250];
                                     sscanf(buffer, "PASSWORD %s", contrasena);
@@ -310,7 +310,7 @@ int main ( )
                                 } else if( strncmp(buffer, "INICIAR-PARTIDA", strlen("INICIAR-PARTIDA")) == 0 ) {
 
                                     bool conectado = false;
-                                    conectado = ConectadoConUsuarioYContrasña(vjugadores, i);
+                                    conectado = ConectadoConUsuarioYContraseña(vjugadores, i);
 
                                     if(conectado) {
                                         int aux, j, b;
@@ -642,7 +642,7 @@ int main ( )
                                         int estadoJugador = 0;
 
                                         for (int a = 0; a < vjugadores.size(); a++) {
-                                            if(vjugadores[a].identificarUsuario == i) {
+                                            if(vjugadores[a].identificadorUsuario == i) {
                                                 estadoJugador = vjugadores[a].estado;
                                             }
                                         }
