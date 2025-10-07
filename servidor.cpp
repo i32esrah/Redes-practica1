@@ -355,35 +355,39 @@ int main ( )
                                     bool conectado = false;
                                     conectado = ConectadoConUsuarioYContraseña(vjugadores, i);
 
-                                    if (conectado) {
+                                    if (conectado) { // Jugador autenticado
                                         bool turnoJugador, plantadoJugador;
-                                        int estadoJugador = 0;
+                                        int estadoJugador = 0, puntosJugador = 0;
 
+                                        // Comprobar turno del jugador
                                         for(int a = 0; a < vjugadores.size(); a++) {
                                             if( vjugadores[a].identificadorUsuario == i ){
                                                 estadoJugador = vjugadores[a].estado;
                                                 turnoJugador = vjugadores[a].turno;
                                                 plantadoJugador = vjugadores[a].plantado;
+                                                puntosJugador = vjugadores[a].puntos;
                                             }
                                         }
 
                                         if (estadoJugador == 4) {
+
                                             if (!plantadoJugador) {
+
                                                 if ( turnoJugador ) {
-                                                    int idbaraja = 0; idJugador2 = 0;
+                                                    int idJugador2 = 0, objetivo = 0;
                                                     bool plantadoJugador2;
 
                                                     for( int h = 0; h < vpartidas.size(); h++ ) {
 
                                                         if( vpartidas[h].jugador1.identificadorUsuario == i) {
 
-                                                            idbaraja = vpartidas[h].baraja.identificadorBaraja;
+                                                            objetivo = vpartidas[h].objetivo;
                                                             idJugador2 = vpartidas[h].jugador2.identificadorUsuario;
                                                             plantadoJugador2 = vpartidas[h].jugador2.plantado;
 
                                                         } else if( vpartidas[h].jugador2.identificadorUsuario == i ) {
 
-                                                            idbaraja = vpartidas[h].baraja.identificadorBaraja;
+                                                            objetivo = vpartidas[h].objetivo;
                                                             idJugador2 = vpartidas[h].jugador1.identificadorUsuario;
                                                             plantadoJugador2 = vpartidas[h].jugador1.plantado;
                                                         }
@@ -393,6 +397,45 @@ int main ( )
                                                     for(int l = 0; l < vjugadores.size(); l++) {
                                                         if (vjugadores[l].identificadorUsuario == i) {
                                                             
+                                                            if( puntosJugador < objetivo ) {
+                                                                int tiradas;
+
+                                                                sscanf(buffer, "TIRAR-DADOS %d", &tiradas);
+
+                                                                if(tiradas == 2){
+                                                                    int n1 = tirarDados();
+                                                                    int n2 = tirarDados();
+
+                                                                    puntosJugador += n1 + n2;
+
+                                                                    vjugadores[l].puntos = puntosJugador;
+
+                                                                    bzero(buffer, sizeof(buffer));
+                                                                    sprintf(buffer, "+Ok.[<DADO 1>, <%d>; <DADO 2>, <%d>; <PUNTUACIÓN TOTAL>, <%d>]", n1, n2, puntosJugador);
+                                                                    send(i, buffer, sizeof(buffer), 0);
+
+                                                                    bzero(buffer, sizeof(buffer));
+                                                                    sprintf(buffer, "+Ok.[<TIRADA DEL RIVAL>, <%d>; <PUNTUACIÓN TOTAL DEL RIVAL>, <%d>]", n1 + n2, puntosJugador);
+                                                                    send(idJugador2, buffer, sizeof(buffer), 0);
+
+                                                                } else if (tiradas == 1){
+
+                                                                    int n1 = tirarDados();
+
+                                                                    puntosJugador += n1;
+
+                                                                    vjugadores[l].puntos = puntosJugador;
+
+                                                                    bzero(buffer, sizeof(buffer));
+                                                                    sprintf(buffer, "+Ok.[<DADO 1>, <%d>; <PUNTUACIÓN TOTAL>, <%d>]", n1, puntosJugador);
+                                                                    send(i, buffer, sizeof(buffer), 0);
+
+                                                                    bzero(buffer, sizeof(buffer));
+                                                                    sprintf(buffer, "+Ok.[<TIRADA DEL RIVAL>, <%d>; <PUNTUACIÓN TOTAL DEL RIVAL>, <%d>]", n1, puntosJugador);
+                                                                    send(idJugador2, buffer, sizeof(buffer), 0);
+
+                                                                }
+                                                            }
                                                         }
                                                     }
 
