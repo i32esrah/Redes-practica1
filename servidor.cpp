@@ -492,21 +492,28 @@ int main ( )
 
                                         if (estadoJugador == 4){
                                             int idJugador2 = 0;
+                                            bool plantadoJugador2;
                                             for (int h = 0; h < vpartidas.size(); h++) {
                                                 if (vpartidas[h].jugador1.identificadorUsuario == i) {
 
                                                     idJugador2 = vpartidas[h].jugador2.identificadorUsuario;
+                                                    plantadoJugador2 = vpartidas[h].jugador2.plantado;
                                                 }
                                                 else if (vpartidas[h].jugador2.identificadorUsuario == i) {
 
                                                     idJugador2 = vpartidas[h].jugador1.identificadorUsuario;
+                                                    plantadoJugador2 = vpartidas[h].jugador2.plantado;
+
                                                 }
                                             }
 
                                             for (int a = 0; a < vjugadores.size(); a++) {
                                                 if (vjugadores[a].identificadorUsuario == i) { // El jugador no tira dados y pierde turno
                                                 
-                                                    vjugadores[a].turno = false;
+                                                    if(!plantadoJugador2){
+
+                                                        vjugadores[a].turno = false;
+                                                    }
 
                                                     vjugadores[a].contadorNoTirarDados++;
                                                     
@@ -519,7 +526,7 @@ int main ( )
                                                 else if (vjugadores[a].identificadorUsuario == idJugador2) // El jugador 2 puede seguir jugando
                                                 {
 
-                                                    if(!vjugadores[a].plantado) {
+                                                    if(!plantadoJugador2) {
 
                                                         vjugadores[a].turno = true;
                                                         
@@ -528,6 +535,9 @@ int main ( )
                                                         send(idJugador2, buffer, sizeof(buffer), 0);
                                                     } else {
                                                         
+                                                        bzero(buffer, sizeof(buffer));
+                                                        sprintf(buffer, "+Ok. Es tu turno, el jugador contrario está plantado.");
+                                                        send(i, buffer, sizeof(buffer), 0);
                                                     }
                                                 }
                                             }
