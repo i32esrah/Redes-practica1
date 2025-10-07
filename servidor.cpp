@@ -434,16 +434,51 @@ int main ( )
                                                                     sprintf(buffer, "+Ok.[<TIRADA DEL RIVAL>, <%d>; <PUNTUACIÓN TOTAL DEL RIVAL>, <%d>]", n1, puntosJugador);
                                                                     send(idJugador2, buffer, sizeof(buffer), 0);
 
+                                                                } else {
+                                                                    bzero(buffer, sizeof(buffer));
+                                                                    sprintf(buffer, "-Err. El usuario puede tirar 1 o 2 dados.");
+                                                                    send(i, buffer, sizeof(buffer), 0);
                                                                 }
+
+                                                            } else if(puntosJugador > objetivo) {
+                                                                bzero(buffer, sizeof(buffer));
+                                                                sprintf(buffer, "-ERR. Excedido el valor de %d.", objetivo);
+                                                                send(i, buffer, sizeof(buffer), 0);
+
+                                                            } else {
+                                                                bzero(buffer, sizeof(buffer));
+                                                                sprintf(buffer, "-ERR. No puedes tirar más dados, ya que tu suma es igual a %d.", objetivo);
+                                                                send(i, buffer, sizeof(buffer), 0);
                                                             }
                                                         }
                                                     }
+                                                } else { // No es el turno de este jugador
 
-
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "-ERR. Turno del jugador contrario. Espera al otro jugador.");
+                                                    send(i, buffer, sizeof(buffer), 0);
                                                 }
+                                            } else { // Este jugador se ha plantado
+                                                bzero(buffer, sizeof(buffer));
+                                                sprintf(buffer, "-ERR. No puedes tirar dados. Te has plantado.");
+                                                send(i, buffer, sizeof(buffer), 0);
                                             }
+                                        } else { // El jugador no está en una partida
+                                            bzero(buffer, sizeof(buffer));
+                                            sprintf(buffer, "-ERR. No puedes tirar dados fuera de una partida.");
+                                            send(i, buffer, sizeof(buffer), 0);
                                         }
+                                    } else { // Jugador no logueado
+
+                                        bzero(buffer, sizeof(buffer));
+                                        sprintf(buffer, "-ERR. No puedes tirar dados sin antes loguearte.");
+                                        send(i, buffer, sizeof(buffer), 0);
                                     }
+
+                                } else if (strncmp(buffer, "NO-TIRAR-DADOS", strlen("NO-TIRAR-DADOS")) == 0){
+
+                                    bool conectado = false;
+                                    conectado = ConectadoConUsuarioY
 
                                 }
                                                                 
