@@ -75,7 +75,7 @@ int main(){
     FD_SET(sd,&readfds);
 
     //Capturamos la señal SIGINT (Ctrl+c)
-    signal(SIGINT, manejador);
+    signal(SIGINT, SIG_IGN);
 
     
 	/* ------------------------------------------------------------------
