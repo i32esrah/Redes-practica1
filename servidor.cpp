@@ -274,7 +274,7 @@ int main ( )
 
                                 } else if(strncmp(buffer, "PASSWORD ", strlen("PASSWORD ")) == 0){
                                     
-                                    char contrasena[250];
+                                    char contraseña[250];
                                     sscanf(buffer, "PASSWORD %s", contrasena);
 
                                     if( IntroducirContraseña(vjugadores, i, contraseña) == true ){ //Contraseña
@@ -613,13 +613,13 @@ int main ( )
                                                             }
                                                         }
                                                     }
+                                                } else { // No es el turno de este jugador
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "-ERR. Turno del jugador contrario. Espera al otro jugador.");
+                                                    send(i, buffer, sizeof(buffer), 0);
                                                 }
                                                 
-                                            } else { // No es el turno de este jugador
-                                                bzero(buffer, sizeof(buffer));
-                                                sprintf(buffer, "-ERR. Turno del jugador contrario. Espera al otro jugador.");
-                                                send(i, buffer, sizeof(buffer), 0);
-                                            }
+                                            } 
 
                                         } else { // El jugador no está en una partida
                                             bzero(buffer, sizeof(buffer));
