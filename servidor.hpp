@@ -109,6 +109,13 @@ bool comprobarConexiones(vector<struct jugadores> vjugadores, int id)
 
 int IntroducirUsuarioRegistrado(vector<struct jugadores> &vjugadores, int id, const char *jugador)
 {
+
+    for(int i = 0; i < vjugadores.size(); i++) {
+        if( strncmp(jugador, vjugadores[i].usuario.c_str(), strlen(jugador)) == 0 ) {
+            return 4;
+        }
+    }
+
     FILE *fichero;
     char linea[MSG_SIZE];
 

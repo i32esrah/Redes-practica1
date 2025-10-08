@@ -13,13 +13,6 @@
 #include "servidor.hpp"
 
 
-void manejador(int signum){
-    printf("\n-ERR. Se ha recibido la señal sigint. Para apagar el servidor introduzca SALIR.\n");
-    
-    
-}
-
-
 int main(){
 
 /*---------------------------------------------------- 

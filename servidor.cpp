@@ -266,6 +266,10 @@ int main ( )
                                         sprintf(buffer, "-ERR. Demasiados clientes conectados.");
                                         send(i, buffer, sizeof(buffer), 0);
 
+                                    } else if( introducirRes == 4 ) {
+                                        bzero(buffer, sizeof(buffer));
+                                        sprintf(buffer, "-ERR. Este usuario ya está logueado.");
+                                        send(i, buffer, sizeof(buffer), 0);
                                     }
 
                                 } else if(strncmp(buffer, "PASSWORD ", strlen("PASSWORD ")) == 0){
