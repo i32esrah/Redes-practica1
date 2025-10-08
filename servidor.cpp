@@ -6,7 +6,7 @@
 #include <netdb.h>
 #include <stdlib.h>
 #include <string.h>
-#include<signal.h>
+#include <signal.h>
 #include <unistd.h>
 #include <time.h>
 #include <arpa/inet.h>
@@ -104,9 +104,6 @@ int main ( )
     FD_SET(sd,&readfds);
     FD_SET(0,&readfds);
     
-   	
-    //Capturamos la señal SIGINT (Ctrl+c)
-    signal(SIGINT,manejador);
     
 	/*-----------------------------------------------------------------------
 		El servidor acepta una petición
@@ -864,11 +861,4 @@ void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClie
     
     (*numClientes)--;
 
-}
-
-
-void manejador (int signum){
-    printf("\n-ERR. Se ha recibido la señal sigint. Para apagar el servidor introduzca SALIR.\n");
-    signal(SIGINT,manejador);
-    
 }

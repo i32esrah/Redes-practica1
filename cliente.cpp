@@ -5,11 +5,19 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <stdlib.h>
+#include <signal.h>
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
 #include <arpa/inet.h>
 #include "servidor.hpp"
+
+
+void manejador(int signum){
+    printf("\n-ERR. Se ha recibido la señal sigint. Para apagar el servidor introduzca SALIR.\n");
+    
+    
+}
 
 
 int main(){
@@ -65,6 +73,9 @@ int main(){
     
     FD_SET(0,&readfds);
     FD_SET(sd,&readfds);
+
+    //Capturamos la señal SIGINT (Ctrl+c)
+    signal(SIGINT, manejador);
 
     
 	/* ------------------------------------------------------------------
