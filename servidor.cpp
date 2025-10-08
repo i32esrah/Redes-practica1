@@ -103,6 +103,8 @@ int main ( )
     FD_ZERO(&auxfds);
     FD_SET(sd,&readfds);
     FD_SET(0,&readfds);
+
+    srand(time(NULL));
     
     
 	/*-----------------------------------------------------------------------
@@ -227,7 +229,7 @@ int main ( )
 
                                         // Alerta al otro usuario de que su rival ha abandonado la partida.
                                         bzero(buffer, sizeof(buffer));
-                                        sprintf(buffer, "+Ok. Tu oponente ha terminado la partida");
+                                        sprintf(buffer, "+Ok. Tu oponente ha terminado la partida\n");
                                         send(idJugador2, buffer, sizeof(buffer), 0);
 
                                         // Saca a los jugadores de la partida.
@@ -249,7 +251,7 @@ int main ( )
 
                                     if( introducirRes == 1 ) {
                                         bzero(buffer, sizeof(buffer));
-                                        sprintf(buffer, "+Ok. USUARIO correcto.");
+                                        sprintf(buffer, "+Ok. USUARIO correcto.\n");
                                         send(i, buffer, sizeof(buffer), 0);
 
                                         printf("Cliente <%d> conectado con usuario correctamente.\n", i);

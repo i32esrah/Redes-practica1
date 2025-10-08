@@ -359,7 +359,6 @@ void eliminaJugador(vector<struct jugadores> &vjugadores, int id, vector<struct 
 
 int tirarDados(){
 
-    srand(time(NULL));
     return 1 + rand() % 6;
 
 }
