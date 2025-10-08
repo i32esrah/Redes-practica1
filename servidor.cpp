@@ -224,7 +224,7 @@ int main ( )
 
                                             } else if( vpartidas[j].jugador2.identificadorUsuario == i ) {
 
-                                                idJugador2 = vpartidas[j].jugador1.identificador;
+                                                idJugador2 = vpartidas[j].jugador1.identificadorUsuario;
 
                                             }
                                         }
@@ -275,7 +275,7 @@ int main ( )
                                 } else if(strncmp(buffer, "PASSWORD ", strlen("PASSWORD ")) == 0){
                                     
                                     char contraseña[250];
-                                    sscanf(buffer, "PASSWORD %s", contrasena);
+                                    sscanf(buffer, "PASSWORD %s", contraseña);
 
                                     if( IntroducirContraseña(vjugadores, i, contraseña) == true ){ //Contraseña
                                         bzero(buffer, sizeof(buffer));
@@ -313,7 +313,7 @@ int main ( )
                                     conectado = ConectadoConUsuarioYContraseña(vjugadores, i);
 
                                     if(conectado) {
-                                        int aux, j, b;
+                                        int aux, j, b, res;
 
                                         int num = rand() % (200 - 60 + 1) + 60;
                                         
@@ -547,6 +547,9 @@ int main ( )
                                     
 
                                     if( conectado ) {
+
+                                        int estadoJugador, puntosJugador;
+                                        bool turnoJugador, plantadoJugador;
 
                                         for(int a = 0; a < vjugadores.size(); a++) {
                                             if( vjugadores[a].identificadorUsuario == i ){
