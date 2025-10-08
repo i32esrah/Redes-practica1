@@ -177,15 +177,28 @@ bool RegistrarJugadorFichero(char *jugador, char *contrasena)
     char linea[MSG_SIZE];
     bool usuarioEncontrado = false;
 
+    
     fichero = fopen("usuarios.txt", "r");
-    if (fichero == NULL)
-    {
+    if (fichero == NULL){
+        printf("No existe el archivo usuarios.txt. Procede a crearlo.\n");
+        fichero = fopen("usuarios.txt", "w");
+        if (fichero == NULL)
+        {
+            printf("Error al abrir el archivo.\n");
+            return false;
+        }
+        fclose(fichero);
+        
+    }
+
+    fichero = fopen("usuarios.txt", "r");
+    if (fichero == NULL){
         printf("Error al abrir el archivo.\n");
         return false;
     }
+    
+    while (fgets(linea, MSG_SIZE, fichero) != NULL){
 
-    while (fgets(linea, MSG_SIZE, fichero) != NULL)
-    {
         char usuarioArchivo[MSG_SIZE];
         char contrasenaArchivo[MSG_SIZE];
 

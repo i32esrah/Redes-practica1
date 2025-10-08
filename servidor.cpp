@@ -148,7 +148,6 @@ int main ( )
                                     bzero(buffer, sizeof(buffer));
                                     sprintf(buffer, "------------------ OPCIONES ------------------\nUSUARIO usuario\nPASSWORD contraseña\nREGISTRO -u usuario -p contraseña\nINICIAR-PARTIDA\nTIRAR-DADOS\nNO-TIRAR-DADOS\nPLANTARME\nSALIR\n----------------------------------------------\n");
                                     send(new_sd, buffer, sizeof(buffer), 0);
-                                    close(new_sd);
                                 }
                                 else
                                 {
@@ -244,11 +243,11 @@ int main ( )
 
                                     salirCliente(i, &readfds, &numClientes, arrayClientes);
                                     
-                                } else if(strncmp(buffer, "USUARIO", strlen("USUARIO ")) == 0 ) {
+                                } else if(strncmp(buffer, "USUARIO ", strlen("USUARIO ")) == 0 ) {
 
                                     //Obtenemos el nombre del usuario
                                     char jugador[250];
-                                    sscanf(buffer, "Usuario %s", jugador);
+                                    sscanf(buffer, "USUARIO %s", jugador);
                                     int introducirRes = IntroducirUsuarioRegistrado(vjugadores, i, jugador);
 
                                     if( introducirRes == 1 ) {
@@ -438,7 +437,7 @@ int main ( )
                                                                                 vjugadores[a].turno = true;
                                                                                 
                                                                                 bzero(buffer, sizeof(buffer));
-                                                                                sprintf(buffer, "+Ok. Es tu turno.");
+                                                                                sprintf(buffer, "+Ok. Es tu turno.\n");
                                                                                 send(idJugador2, buffer, sizeof(buffer), 0);
                                                                             } else {
                                                                                 
@@ -473,7 +472,7 @@ int main ( )
                                                                     }
 
                                                                     bzero(buffer, sizeof(buffer));
-                                                                    sprintf(buffer, "+Ok. Has perdido el turno.");
+                                                                    sprintf(buffer, "+Ok. Has perdido el turno.\n");
                                                                     send(i, buffer, sizeof(buffer), 0);
 
                                                                     for (int a = 0; a < vjugadores.size(); a++) {
