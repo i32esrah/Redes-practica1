@@ -496,7 +496,7 @@ int main ( )
 
                                                                 } else if (tiradas == 1){
 
-                                                                    int n1 = 201;
+                                                                    int n1 = tirarDados();
 
                                                                     puntosJugador += n1;
 
