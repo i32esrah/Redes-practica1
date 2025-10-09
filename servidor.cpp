@@ -776,16 +776,31 @@ int main ( )
 
                                                 // Han empatado los jugadores
                                                 if ((puntosJugador1 == puntosJugador2) && (puntosJugador1 <= objetivo)) {
+
+                                                    string tabla = tablaResultado(puntosJugador1, puntosJugador2);
+
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "%s\n", tabla.c_str());
+                                                    send(i, buffer, sizeof(buffer), 0);
+                                                    send(idJugador2, buffer, sizeof(buffer), 0);
+
+
                                                     bzero(buffer, sizeof(buffer));
                                                     sprintf(buffer, "+Ok. Jugador %s y Jugador %s habéis empatado la partida", usuario1.c_str(), usuario2.c_str());
                                                     send(i, buffer, sizeof(buffer), 0);
-                                                    bzero(buffer, sizeof(buffer));
-                                                    sprintf(buffer, "+Ok. Jugador %s y Jugador %s habéis empatado la partida", usuario1.c_str(), usuario2.c_str());
                                                     send(idJugador2, buffer, sizeof(buffer), 0);
                                                 }
                                                 // Jugador 2 ha ganado la partida
                                                 else if ((puntosJugador1 < puntosJugador2) && (puntosJugador1 <= objetivo) && (puntosJugador2 <= objetivo))
                                                 {
+
+                                                    string tabla = tablaResultado(puntosJugador1, puntosJugador2);
+
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "%s\n", tabla.c_str());
+                                                    send(i, buffer, sizeof(buffer), 0);
+                                                    send(idJugador2, buffer, sizeof(buffer), 0);
+
                                                     bzero(buffer, sizeof(buffer));
                                                     sprintf(buffer, "+Ok. Jugador %s ha ganado la partida", usuario2.c_str());
                                                     send(i, buffer, sizeof(buffer), 0);
@@ -796,6 +811,14 @@ int main ( )
                                                 // Jugador 1 ha ganado la partida
                                                 else if ((puntosJugador1 > puntosJugador2) && (puntosJugador1 <= objetivo) && (puntosJugador2 <= objetivo))
                                                 {
+
+                                                    string tabla = tablaResultado(puntosJugador1, puntosJugador2);
+
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "%s\n", tabla.c_str());
+                                                    send(i, buffer, sizeof(buffer), 0);
+                                                    send(idJugador2, buffer, sizeof(buffer), 0);
+
                                                     bzero(buffer, sizeof(buffer));
                                                     sprintf(buffer, "+Ok. Jugador %s ha ganado la partida", usuario1.c_str());
                                                     send(i, buffer, sizeof(buffer), 0);
@@ -806,6 +829,14 @@ int main ( )
                                                 // Jugador 2 ha superado el objetivo
                                                 else if ((puntosJugador1 <= objetivo) && (puntosJugador2 > objetivo))
                                                 {
+
+                                                    string tabla = tablaResultado(puntosJugador1, puntosJugador2);
+
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "%s\n", tabla.c_str());
+                                                    send(i, buffer, sizeof(buffer), 0);
+                                                    send(idJugador2, buffer, sizeof(buffer), 0);
+
                                                     bzero(buffer, sizeof(buffer));
                                                     sprintf(buffer, "+Ok. Jugador %s ha ganado la partida", usuario1.c_str());
                                                     send(i, buffer, sizeof(buffer), 0);
@@ -816,6 +847,14 @@ int main ( )
                                                 // Jugador 1 ha superado el objetivo
                                                 else if ((puntosJugador1 > objetivo) && (puntosJugador2 <= objetivo))
                                                 {
+
+                                                    string tabla = tablaResultado(puntosJugador1, puntosJugador2);
+
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "%s\n", tabla.c_str());
+                                                    send(i, buffer, sizeof(buffer), 0);
+                                                    send(idJugador2, buffer, sizeof(buffer), 0);
+
                                                     bzero(buffer, sizeof(buffer));
                                                     sprintf(buffer, "+Ok. Jugador %s ha ganado la partida", usuario2.c_str());
                                                     send(i, buffer, sizeof(buffer), 0);
@@ -826,6 +865,14 @@ int main ( )
                                                 // Ninguno ha ganado
                                                 else if ((puntosJugador1 > objetivo) && (puntosJugador2 > objetivo))
                                                 {
+
+                                                    string tabla = tablaResultado(puntosJugador1, puntosJugador2);
+
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "%s\n", tabla.c_str());
+                                                    send(i, buffer, sizeof(buffer), 0);
+                                                    send(idJugador2, buffer, sizeof(buffer), 0);
+
                                                     bzero(buffer, sizeof(buffer));
                                                     sprintf(buffer, "+Ok. No hay ganadores");
                                                     send(i, buffer, sizeof(buffer), 0);

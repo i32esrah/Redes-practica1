@@ -376,3 +376,13 @@ void imprimirVariable(jugadores jugador){
     printf("Identificador del usuario: %d\n", jugador.identificadorUsuario);
 
 }
+
+string tablaResultado(int j1, int j2) {
+
+    ostringstream oss;
+
+    oss << "-------------------------------------------------\n|\tJUGADOR 1	|\tJUGADOR 2\t|\n-------------------------------------------------\n|                       |                       |\n|         "<< j1 <<"            |           "<< j2 <<"          |\n|                       |                       |\n-------------------------------------------------";
+
+    string res = oss.str();
+    return res;
+}
