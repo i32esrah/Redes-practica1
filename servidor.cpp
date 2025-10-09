@@ -337,12 +337,12 @@ int main ( )
                                             for(int index = 0; index < vpartidas.size(); index++) {
                                                 if( vpartidas[index].jugador1.identificadorUsuario == i ) {
                                                     bzero(buffer, sizeof(buffer));
-                                                    sprintf(buffer, "+Ok. Empiezas la partida.\n", num);
+                                                    sprintf(buffer, "+Ok. Empiezas la partida.\n");
                                                     send(i, buffer, sizeof(buffer), 0);
 
                                                 } else if( vpartidas[index].jugador1.identificadorUsuario == j ) {
                                                     bzero(buffer, sizeof(buffer));
-                                                    sprintf(buffer, "+Ok. Empiezas la partida.\n", num);
+                                                    sprintf(buffer, "+Ok. Empiezas la partida.\n");
                                                     send(j, buffer, sizeof(buffer), 0);
 
                                                 }
