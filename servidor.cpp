@@ -281,13 +281,13 @@ int main ( )
 
                                     if( IntroducirContraseña(vjugadores, i, contraseña) == true ){ //Contraseña
                                         bzero(buffer, sizeof(buffer));
-                                        sprintf(buffer, "+OK. Usuario validado");
+                                        sprintf(buffer, "+OK. Usuario validado\n");
                                         send(i, buffer, sizeof(buffer), 0);
 
                                         printf("Cliente <%d> conectado con contraseña correctamente.\n", i);
                                     } else {
                                         bzero(buffer, sizeof(buffer));
-                                        sprintf(buffer, "-ERR. Error en la validacion");
+                                        sprintf(buffer, "-ERR. Error en la validacion\n");
                                         send(i, buffer, sizeof(buffer), 0);
                                     }
                                 
@@ -299,13 +299,13 @@ int main ( )
 
                                     if( RegistrarJugadorFichero(usuario, contrasena) == true ){ //El usuario fue registrado
                                         bzero(buffer, sizeof(buffer));
-                                        sprintf(buffer, "+OK. Usuario registrado correctamente");
+                                        sprintf(buffer, "+OK. Usuario registrado correctamente\n");
                                         send(i, buffer, sizeof(buffer), 0);
 
                                         printf("Cliente <%d> registrado correctamente.\n", i);
                                     } else {
                                         bzero(buffer, sizeof(buffer));
-                                        sprintf(buffer, "-ERR. El nombre de usuario ya ha sido utilizado");
+                                        sprintf(buffer, "-ERR. El nombre de usuario ya ha sido utilizado\n");
                                         send(i, buffer, sizeof(buffer), 0);
                                     }
 
@@ -352,7 +352,119 @@ int main ( )
                                         sprintf(buffer, "-ERR. No puedes iniciar partida sin antes loguearte.");
                                         send(i, buffer, sizeof(buffer), 0);
                                     }
-                                } else if( strncmp(buffer, "TIRAR-DADOS", strlen("TIRAR-DADOS")) == 0 ){
+                                } else if( strncmp(buffer, "TIRAR-DADOS", strlen("TIRAR-DADOS")) == 0 ) {
+
+                                    bool conectado = false;
+                                    conectado = ConectadoConUsuarioYContraseña(vjugadores, i);
+
+                                    if (conectado) {
+
+                                        bool turnoJugador, plantadoJugador, plantadoJugador2;
+                                        int estadoJugador = 0, puntosJugador = 0;
+
+                                        for(int a = 0; a < vpartidas.size(); a++) {
+                                            if( vpartidas[a].jugador1.identificadorUsuario == i ) {
+                                                estadoJugador = vpartidas[a].jugador1.estado;
+                                                turnoJugador = vpartidas[a].jugador1.turno;
+                                                plantadoJugador = vpartidas[a].jugador1.plantado;
+                                                puntosJugador = vpartidas[a].jugador1.puntos;
+                                                plantadoJugador2 = vpartidas[a].jugador2.plantado;
+                                            }
+                                        }
+
+                                        if( estadoJugador == 4 ) {
+                                            if(!plantadoJugador) {
+
+                                                if ( !plantadoJugador2 ) {
+
+                                                    if( turnoJugador ) {
+                                                        int idJugador2 = 0, objetivo = 0;
+                                                        int indexPartida;
+
+                                                        for( int h = 0; h < vpartidas.size(); h++ ) {
+
+                                                            if( vpartidas[h].jugador1.identificadorUsuario == i) {
+
+                                                                indexPartida = h;
+
+                                                                objetivo = vpartidas[h].objetivo;
+                                                                idJugador2 = vpartidas[h].jugador2.identificadorUsuario;
+                                                                plantadoJugador2 = vpartidas[h].jugador2.plantado;
+
+                                                            } else if( vpartidas[h].jugador2.identificadorUsuario == i ) {
+
+                                                                indexPartida = h;
+
+                                                                objetivo = vpartidas[h].objetivo;
+                                                                idJugador2 = vpartidas[h].jugador1.identificadorUsuario;
+                                                            }
+
+                                                        }
+
+                                                        for(int l = 0; l < vjugadores.size(); l++) {
+
+                                                            if( vjugadores[l].identificadorUsuario == i ) {
+                                                                int tiradas = 0;
+
+                                                                sscanf(buffer, "TIRAR-DADOS %d", &tiradas);
+                                                                
+                                                                if(tiradas == 2) {
+                                                                    int n1 = tirarDados();
+                                                                    int n2 = tirarDados();
+
+                                                                    puntosJugador += n1 + n2;
+
+                                                                    vjugadores[l].puntos = puntosJugador;
+
+                                                                    bzero(buffer, sizeof(buffer));
+                                                                    sprintf(buffer, "+Ok.[<DADO 1>, <%d>; <DADO 2>, <%d>; <PUNTUACIÓN TOTAL>, <%d>]\n", n1, n2, puntosJugador);
+                                                                    send(i, buffer, sizeof(buffer), 0);
+
+                                                                    bzero(buffer, sizeof(buffer));
+                                                                    sprintf(buffer, "+Ok.[<TIRADA DEL RIVAL>, <%d>; <PUNTUACIÓN TOTAL DEL RIVAL>, <%d>]\n", n1 + n2, puntosJugador);
+                                                                    send(idJugador2, buffer, sizeof(buffer), 0);
+
+
+                                                                } else if(tiradas == 1) {
+                                                                    int n1 = tirarDados();
+
+                                                                    puntosJugador += n1 + n2;
+
+                                                                    vjugadores[l].puntos = puntosJugador;
+
+                                                                    bzero(buffer, sizeof(buffer));
+                                                                    sprintf(buffer, "+Ok.[<DADO 1>, <%d>; <DADO 2>, <%d>; <PUNTUACIÓN TOTAL>, <%d>]\n", n1, n2, puntosJugador);
+                                                                    send(i, buffer, sizeof(buffer), 0);
+
+                                                                    bzero(buffer, sizeof(buffer));
+                                                                    sprintf(buffer, "+Ok.[<TIRADA DEL RIVAL>, <%d>; <PUNTUACIÓN TOTAL DEL RIVAL>, <%d>]\n", n1 + n2, puntosJugador);
+                                                                    send(idJugador2, buffer, sizeof(buffer), 0);
+                                                                } else {
+                                                                    bzero(buffer, sizeof(buffer));
+                                                                    sprintf(buffer, "-Err. El usuario puede tirar 1 o 2 dados.");
+                                                                    send(i, buffer, sizeof(buffer), 0);
+                                                                }
+
+                                                                vjugadores[l].turno = false;
+
+                                                                if( vpartidas[indexPartida].jugador1 != i ){
+                                                                    
+                                                                }
+
+                                                                
+                                                            }
+
+                                                        }
+
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                }
+                                
+                                else if( strncmp(buffer, "TIRAR-DADOS", strlen("TIRAR-DADOS")) == 0 ){
 
                                     bool conectado = false;
                                     conectado = ConectadoConUsuarioYContraseña(vjugadores, i);
@@ -374,6 +486,8 @@ int main ( )
                                         if (estadoJugador == 4) {
 
                                             if (!plantadoJugador) {
+
+                                                // plantadoJugador2
 
                                                 if ( turnoJugador ) {
                                                     int idJugador2 = 0, objetivo = 0;
@@ -488,11 +602,13 @@ int main ( )
                                                                     if(!plantadoJugador2){
 
                                                                         vjugadores[l].turno = false;
+
+                                                                        bzero(buffer, sizeof(buffer));
+                                                                        sprintf(buffer, "+Ok. Has perdido el turno.\n");
+                                                                        send(i, buffer, sizeof(buffer), 0);
                                                                     }
 
-                                                                    bzero(buffer, sizeof(buffer));
-                                                                    sprintf(buffer, "+Ok. Has perdido el turno.\n");
-                                                                    send(i, buffer, sizeof(buffer), 0);
+                                                                    
 
                                                                     for (int a = 0; a < vjugadores.size(); a++) {
                                                                         
