@@ -334,6 +334,20 @@ int main ( )
                                             sprintf(buffer, "+Ok. Empieza la partida. NÚMERO OBJETIVO: %d\n", num);
                                             send(j, buffer, sizeof(buffer), 0);
 
+                                            for(int index = 0; index < vpartidas.size(); index++) {
+                                                if( vpartidas[index].jugador1.identificadorUsuario == i ) {
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "+Ok. Empiezas la partida.\n", num);
+                                                    send(i, buffer, sizeof(buffer), 0);
+
+                                                } else if( vpartidas[index].jugador1.identificadorUsuario == j ) {
+                                                    bzero(buffer, sizeof(buffer));
+                                                    sprintf(buffer, "+Ok. Empiezas la partida.\n", num);
+                                                    send(j, buffer, sizeof(buffer), 0);
+
+                                                }
+                                            }
+
                                         } else if(res == 2) {
                                             
                                             bzero(buffer, sizeof(buffer));
@@ -600,16 +614,24 @@ int main ( )
                                                     bool plantadoJugador2;
 
                                                     for (int h = 0; h < vpartidas.size(); h++) {
-                                                        if (vpartidas[h].jugador1.identificadorUsuario == i) {
+                                                        if( vpartidas[h].jugador1.identificadorUsuario == i) {
 
                                                             idJugador2 = vpartidas[h].jugador2.identificadorUsuario;
-                                                            plantadoJugador2 = vpartidas[h].jugador2.plantado;
-                                                        }
-                                                        else if (vpartidas[h].jugador2.identificadorUsuario == i) {
+
+                                                            for(int l = 0; l < vjugadores.size(); l++) {
+                                                                if(vjugadores[l].identificadorUsuario == idJugador2) {
+                                                                    plantadoJugador2 = vjugadores[l].plantado;
+                                                                }
+                                                            }
+
+                                                        } else if( vpartidas[h].jugador2.identificadorUsuario == i ) {
 
                                                             idJugador2 = vpartidas[h].jugador1.identificadorUsuario;
-                                                            plantadoJugador2 = vpartidas[h].jugador2.plantado;
-
+                                                            for(int l = 0; l < vjugadores.size(); l++) {
+                                                                if(vjugadores[l].identificadorUsuario == idJugador2) {
+                                                                    plantadoJugador2 = vjugadores[l].plantado;
+                                                                }
+                                                            }
                                                         }
                                                     }
 

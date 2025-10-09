@@ -146,6 +146,7 @@ int IntroducirUsuarioRegistrado(vector<struct jugadores> &vjugadores, int id, co
                 j.plantado = false;
                 j.identificadorPartida = -1;
                 j.identificadorUsuario = id;
+                j.contadorNoTirarDados = 0;
                 vjugadores.push_back(j);
                 fclose(fichero);
                 return 1; // El usuario es correcto y se ha introducido el jugador en el vector jugadores
