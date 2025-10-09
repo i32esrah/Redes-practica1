@@ -363,3 +363,15 @@ int tirarDados(){
 
 }
 
+void imprimirVariable(jugadores jugador){
+    printf("Usuario: %s\n", jugador.usuario.c_str());
+    printf("Contraseña: %s\n", jugador.contraseña.c_str());
+    printf("Turno: %s\n", jugador.turno ? "true" : "false");
+    printf("Estado: %d\n", jugador.estado);
+    printf("Puntos: %d\n", jugador.puntos);
+    printf("Contador de no tirar dados: %d\n", jugador.contadorNoTirarDados);
+    printf("Plantado: %s\n", jugador.plantado ? "true" : "false");
+    printf("Identificador de la partida: %d\n", jugador.identificadorPartida);
+    printf("Identificador del usuario: %d\n", jugador.identificadorUsuario);
+
+}

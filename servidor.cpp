@@ -413,11 +413,11 @@ int main ( )
                                                                     vjugadores[l].puntos = puntosJugador;
 
                                                                     bzero(buffer, sizeof(buffer));
-                                                                    sprintf(buffer, "+Ok.[<DADO 1>, <%d>; <DADO 2>, <%d>; <PUNTUACIÓN TOTAL>, <%d>]", n1, n2, puntosJugador);
+                                                                    sprintf(buffer, "+Ok.[<DADO 1>, <%d>; <DADO 2>, <%d>; <PUNTUACIÓN TOTAL>, <%d>]\n", n1, n2, puntosJugador);
                                                                     send(i, buffer, sizeof(buffer), 0);
 
                                                                     bzero(buffer, sizeof(buffer));
-                                                                    sprintf(buffer, "+Ok.[<TIRADA DEL RIVAL>, <%d>; <PUNTUACIÓN TOTAL DEL RIVAL>, <%d>]", n1 + n2, puntosJugador);
+                                                                    sprintf(buffer, "+Ok.[<TIRADA DEL RIVAL>, <%d>; <PUNTUACIÓN TOTAL DEL RIVAL>, <%d>]\n", n1 + n2, puntosJugador);
                                                                     send(idJugador2, buffer, sizeof(buffer), 0);
 
                                                                         
@@ -427,16 +427,24 @@ int main ( )
                                                                         for (int a = 0; a < vjugadores.size(); a++) {
                                                                             if(vjugadores[a].identificadorUsuario == idJugador2){
                                                                                 vjugadores[a].turno = true;
-                                                                                send(idJugador2, "+Ok. Es tu turno.", sizeof(buffer), 0);
+                                                                                send(idJugador2, "+Ok. Es tu turno.\n", sizeof(buffer), 0);
                                                                             }
-                                                                            bzero(buffer, sizeof(buffer));
-                                                                            sprintf(buffer, "+Ok. Has perdido el turno.");
-                                                                            send(i, buffer, sizeof(buffer), 0);
+                                                                            
 
                                                                         }
+                                                                        vjugadores[l].turno = false;
+                                                                        bzero(buffer, sizeof(buffer));
+                                                                        sprintf(buffer, "+Ok. Has perdido el turno.\n");
+                                                                        send(i, buffer, sizeof(buffer), 0);
+
                                                                     } else {
+                                                                        
                                                                         // jugador 2 está plantado → jugador 1 mantiene el turno
-                                                                        send(i, "+Ok. El jugador contrario está plantado, mantienes tu turno.", sizeof(buffer), 0);
+                                                                        vjugadores[l].turno = true;
+                                                                        bzero(buffer, sizeof(buffer));
+                                                                        sprintf(buffer, "+Ok. El jugador contrario está plantado, mantienes tu turno.\n");
+                                                                        send(i, buffer, sizeof(buffer), 0);
+                                                                        
                                                                     }
 
                                                                     
@@ -449,9 +457,7 @@ int main ( )
 
                                                                                 vjugadores[a].turno = true;
                                                                                 
-                                                                                bzero(buffer, sizeof(buffer));
-                                                                                sprintf(buffer, "+Ok. Es tu turno.\n");
-                                                                                send(idJugador2, buffer, sizeof(buffer), 0);
+                                                                               
                                                                             } else {
                                                                                 
                                                                                 bzero(buffer, sizeof(buffer));
