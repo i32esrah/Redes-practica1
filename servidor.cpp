@@ -442,7 +442,7 @@ int main ( )
                                                                     send(i, buffer, sizeof(buffer), 0);
 
                                                                     bzero(buffer, sizeof(buffer));
-                                                                    sprintf(buffer, "+Ok.[<TIRADA DEL RIVAL>, <%d>; <PUNTUACIÓN TOTAL DEL RIVAL>, <%d>]\n", n1 + n2, puntosJugador);
+                                                                    sprintf(buffer, "+Ok.[<TIRADA DEL RIVAL>: <DADO 1>, <%d>; <DADO 2>, <%d>]\n", n1, n2);
                                                                     send(idJugador2, buffer, sizeof(buffer), 0);
 
                                                                         
@@ -496,7 +496,7 @@ int main ( )
 
                                                                 } else if (tiradas == 1){
 
-                                                                    int n1 = tirarDados();
+                                                                    int n1 = 201;
 
                                                                     puntosJugador += n1;
 
@@ -507,7 +507,7 @@ int main ( )
                                                                     send(i, buffer, sizeof(buffer), 0);
 
                                                                     bzero(buffer, sizeof(buffer));
-                                                                    sprintf(buffer, "+Ok.[<TIRADA DEL RIVAL>, <%d>; <PUNTUACIÓN TOTAL DEL RIVAL>, <%d>]", n1, puntosJugador);
+                                                                    sprintf(buffer, "+Ok.[<TIRADA DEL RIVAL>: <DADO 1>, <%d>]", n1);
                                                                     send(idJugador2, buffer, sizeof(buffer), 0);
 
                                                                     if(!plantadoJugador2){
@@ -550,7 +550,7 @@ int main ( )
 
                                                             } else if(puntosJugador > objetivo) {
                                                                 bzero(buffer, sizeof(buffer));
-                                                                sprintf(buffer, "-ERR. Excedido el valor de %d.", objetivo);
+                                                                sprintf(buffer, "-ERR. Excedido el valor de %d. Solo puedes plantarte", objetivo);
                                                                 send(i, buffer, sizeof(buffer), 0);
 
                                                             } else {

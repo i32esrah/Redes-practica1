@@ -7,7 +7,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
- 
+#include <sstream>
+
 using namespace std;
 
 /**
@@ -381,7 +382,7 @@ string tablaResultado(int j1, int j2) {
 
     ostringstream oss;
 
-    oss << "-------------------------------------------------\n|\tJUGADOR 1	|\tJUGADOR 2\t|\n-------------------------------------------------\n|                       |                       |\n|         "<< j1 <<"            |           "<< j2 <<"          |\n|                       |                       |\n-------------------------------------------------";
+    oss << "-------------------------------------------------\n|\tJUGADOR 1	|\tJUGADOR 2\t|\n-------------------------------------------------\n|                       |                       |\n|         "<< j1 <<"            |           "<< j2 <<"          |";
 
     string res = oss.str();
     return res;
