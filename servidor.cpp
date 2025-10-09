@@ -587,13 +587,11 @@ int main ( )
 
                                     bool conectado = false;
                                     conectado = ConectadoConUsuarioYContraseña(vjugadores, i);
-
-                                    // Comprobar turno del jugador
                                     
 
                                     if( conectado ) {
 
-                                        int estadoJugador, puntosJugador;
+                                        int estadoJugador, puntosJugador, noTirarDados;
                                         bool turnoJugador, plantadoJugador;
 
                                         for(int a = 0; a < vjugadores.size(); a++) {
@@ -602,6 +600,8 @@ int main ( )
                                                 turnoJugador = vjugadores[a].turno;
                                                 plantadoJugador = vjugadores[a].plantado;
                                                 puntosJugador = vjugadores[a].puntos;
+                                                noTirarDados = vjugadores[a].contadorNoTirarDados;
+
                                             }
                                         }
 
@@ -609,83 +609,92 @@ int main ( )
 
                                             if (!plantadoJugador){
 
-                                                if (turnoJugador) {
-                                                    int idJugador2 = 0;
-                                                    bool plantadoJugador2;
+                                                if( noTirarDados < 2 ) {
 
-                                                    for (int h = 0; h < vpartidas.size(); h++) {
-                                                        if( vpartidas[h].jugador1.identificadorUsuario == i) {
+                                                    if (turnoJugador) {
 
-                                                            idJugador2 = vpartidas[h].jugador2.identificadorUsuario;
+                                                        int idJugador2 = 0;
+                                                        bool plantadoJugador2;
 
-                                                            for(int l = 0; l < vjugadores.size(); l++) {
-                                                                if(vjugadores[l].identificadorUsuario == idJugador2) {
-                                                                    plantadoJugador2 = vjugadores[l].plantado;
+                                                        for (int h = 0; h < vpartidas.size(); h++) {
+                                                            if( vpartidas[h].jugador1.identificadorUsuario == i) {
+
+                                                                idJugador2 = vpartidas[h].jugador2.identificadorUsuario;
+
+                                                                for(int l = 0; l < vjugadores.size(); l++) {
+                                                                    if(vjugadores[l].identificadorUsuario == idJugador2) {
+                                                                        plantadoJugador2 = vjugadores[l].plantado;
+                                                                    }
                                                                 }
-                                                            }
 
-                                                        } else if( vpartidas[h].jugador2.identificadorUsuario == i ) {
+                                                            } else if( vpartidas[h].jugador2.identificadorUsuario == i ) {
 
-                                                            idJugador2 = vpartidas[h].jugador1.identificadorUsuario;
-                                                            for(int l = 0; l < vjugadores.size(); l++) {
-                                                                if(vjugadores[l].identificadorUsuario == idJugador2) {
-                                                                    plantadoJugador2 = vjugadores[l].plantado;
+                                                                idJugador2 = vpartidas[h].jugador1.identificadorUsuario;
+                                                                for(int l = 0; l < vjugadores.size(); l++) {
+                                                                    if(vjugadores[l].identificadorUsuario == idJugador2) {
+                                                                        plantadoJugador2 = vjugadores[l].plantado;
+                                                                    }
                                                                 }
                                                             }
                                                         }
-                                                    }
 
-                                                    for (int a = 0; a < vjugadores.size(); a++) {
-                                                        if (vjugadores[a].identificadorUsuario == i) { // El jugador no tira dados y pierde turno
-                                                        
-                                                            if(!plantadoJugador2){
-
-                                                                vjugadores[a].turno = false;
-                                                            }
-
-                                                            vjugadores[a].contadorNoTirarDados++;
+                                                        for (int a = 0; a < vjugadores.size(); a++) {
+                                                            if (vjugadores[a].identificadorUsuario == i) { // El jugador no tira dados y pierde turno
                                                             
-                                                            int noTirarDados =  vjugadores[a].contadorNoTirarDados;
+                                                                if(!plantadoJugador2){
 
-                                                            bzero(buffer, sizeof(buffer));
-                                                            sprintf(buffer, "+Ok. No has tirado dados (%d/3). Has perdido el turno.", noTirarDados);
-                                                            send(i, buffer, sizeof(buffer), 0);
-                                                        }
-                                                        else if (vjugadores[a].identificadorUsuario == idJugador2) // El jugador 2 puede seguir jugando
-                                                        {
+                                                                    vjugadores[a].turno = false;
+                                                                }
 
-                                                            if(!plantadoJugador2) {
-
-                                                                vjugadores[a].turno = true;
+                                                                vjugadores[a].contadorNoTirarDados++;
                                                                 
+                                                                int noTirarDados =  vjugadores[a].contadorNoTirarDados;
+
                                                                 bzero(buffer, sizeof(buffer));
-                                                                sprintf(buffer, "+Ok. Es tu turno, el jugador contrario ha decidido no tirar dados.");
-                                                                send(idJugador2, buffer, sizeof(buffer), 0);
-                                                            } else {
-                                                                
-                                                                bzero(buffer, sizeof(buffer));
-                                                                sprintf(buffer, "+Ok. Es tu turno, el jugador contrario está plantado.");
+                                                                sprintf(buffer, "+Ok. No has tirado dados (%d/3). Has perdido el turno.\n", noTirarDados);
                                                                 send(i, buffer, sizeof(buffer), 0);
                                                             }
+                                                            else if (vjugadores[a].identificadorUsuario == idJugador2) // El jugador 2 puede seguir jugando
+                                                            {
+
+                                                                if(!plantadoJugador2) {
+
+                                                                    vjugadores[a].turno = true;
+                                                                    
+                                                                    bzero(buffer, sizeof(buffer));
+                                                                    sprintf(buffer, "+Ok. Es tu turno, el jugador contrario ha decidido no tirar dados.\n");
+                                                                    send(idJugador2, buffer, sizeof(buffer), 0);
+                                                                } else {
+                                                                    
+                                                                    bzero(buffer, sizeof(buffer));
+                                                                    sprintf(buffer, "+Ok. Es tu turno, el jugador contrario está plantado.\n");
+                                                                    send(i, buffer, sizeof(buffer), 0);
+                                                                }
+                                                            }
                                                         }
+                                                    } else { // No es el turno de este jugador
+                                                        bzero(buffer, sizeof(buffer));
+                                                        sprintf(buffer, "-ERR. Turno del jugador contrario. Espera al otro jugador.\n");
+                                                        send(i, buffer, sizeof(buffer), 0);
                                                     }
-                                                } else { // No es el turno de este jugador
+                                                } else {
+
                                                     bzero(buffer, sizeof(buffer));
-                                                    sprintf(buffer, "-ERR. Turno del jugador contrario. Espera al otro jugador.");
+                                                    sprintf(buffer, "-ERR. No puedes realizar esta operación más veces, solo puedes tirar dados o plantarte.\n");
                                                     send(i, buffer, sizeof(buffer), 0);
                                                 }
-                                                
+
                                             } 
 
                                         } else { // El jugador no está en una partida
                                             bzero(buffer, sizeof(buffer));
-                                            sprintf(buffer, "-ERR. No puedes tirar dados fuera de una partida.");
+                                            sprintf(buffer, "-ERR. No puedes tirar dados fuera de una partida.\n");
                                             send(i, buffer, sizeof(buffer), 0);
                                         }
 
                                     } else { // Jugador no logueado
                                         bzero(buffer, sizeof(buffer));
-                                        sprintf(buffer, "-ERR. No puedes tirar dados sin antes loguearte.");
+                                        sprintf(buffer, "-ERR. No puedes tirar dados sin antes loguearte.\n");
                                         send(i, buffer, sizeof(buffer), 0);
                                     }
 
