@@ -692,6 +692,15 @@ int main ( )
                                                     bzero(buffer, sizeof(buffer));
                                                     sprintf(buffer, "+Ok. Te has plantado.");
                                                     send(i, buffer, sizeof(buffer), 0);
+                                                    printf("Usuario: %s\n", vjugadores[a].usuario.c_str());
+                                                    printf("Contraseña: %s\n", vjugadores[a].contraseña.c_str());
+                                                    printf("Turno: %s\n", vjugadores[a].turno ? "true" : "false");
+                                                    printf("Estado: %d\n", vjugadores[a].estado);
+                                                    printf("Puntos: %d\n", vjugadores[a].puntos);
+                                                    printf("Contador de no tirar dados: %d\n", vjugadores[a].contadorNoTirarDados);
+                                                    printf("Plantado: %s\n", vjugadores[a].plantado ? "true" : "false");
+                                                    printf("Identificador de la partida: %d\n", vjugadores[a].identificadorPartida);
+                                                    printf("Identificador del usuario: %d\n", vjugadores[a].identificadorUsuario);
                                                 }
                                                 else if (vjugadores[a].identificadorUsuario == idJugador2) // El jugador 2 puede seguir jugando
                                                 {
