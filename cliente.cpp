@@ -55,7 +55,7 @@ int main(){
 	
 	if (connect(sd, (struct sockaddr *)&sockname, len_sockname) == -1)
 	{
-		perror ("Error de conexión");
+		perror ("Error de conexión\n");
         close(sd);
 		exit(EXIT_FAILURE);
 	}
@@ -78,7 +78,7 @@ int main(){
 	{
         auxfds = readfds;
         if( (salida = select(sd+1,&auxfds,NULL,NULL,NULL)) < 0){
-            perror("Error en la operación de select");
+            perror("Error en la operación de select\n");
             close(sd);
             exit(EXIT_FAILURE);
         };
@@ -88,7 +88,7 @@ int main(){
             
             bzero(buffer,sizeof(buffer)); //Vaciamos el buffer
             if( recv(sd,buffer,sizeof(buffer),0) <= 0){
-                perror("Error en la operación de recv");
+                perror("Error en la operación de recv\n");
                 fin = 1;
                 exit(EXIT_FAILURE);
             }

@@ -74,6 +74,16 @@ struct partidas
 
 #endif
 
+
+/**
+ * @brief Comprueba si un jugador con un ID de socket dado está conectado con un nombre de usuario concreto.
+ * 
+ * @param vjugadores Vector con la lista de jugadores conectados.
+ * @param id Identificador del socket del cliente.
+ * @param jugador Nombre de usuario que se quiere comprobar.
+ * @return true Si el jugador con ese ID y nombre de usuario está conectado.
+ * @return false Si no existe coincidencia.
+ */
 bool ConectadoConUsuario(vector<struct jugadores> &vjugadores, int id, const char *jugador)
 {
     for (int i = 0; i < vjugadores.size(); i++)
@@ -86,7 +96,14 @@ bool ConectadoConUsuario(vector<struct jugadores> &vjugadores, int id, const cha
     return false;
 }
 
-
+/**
+ * @brief Comprueba si un jugador está conectado y ha introducido correctamente su contraseña.
+ * 
+ * @param vjugadores Vector con la lista de jugadores conectados.
+ * @param id Identificador del socket del cliente.
+ * @return true Si el jugador tiene un estado >= 2 (contraseña validada).
+ * @return false En caso contrario.
+ */
 bool ConectadoConUsuarioYContraseña(vector<jugadores> &vjugadores, int id)
 {
     for (int i = 0; i < vjugadores.size(); i++)
@@ -99,6 +116,15 @@ bool ConectadoConUsuarioYContraseña(vector<jugadores> &vjugadores, int id)
     return false;
 }
 
+
+/**
+ * @brief Verifica si aún hay espacio disponible para aceptar nuevas conexiones.
+ * 
+ * @param vjugadores Vector actual de jugadores.
+ * @param id Identificador del socket (no se usa en la comprobación).
+ * @return true Si hay menos jugadores que el máximo permitido.
+ * @return false Si el servidor está lleno.
+ */
 bool comprobarConexiones(vector<struct jugadores> vjugadores, int id)
 {
     if (vjugadores.size() < MAX_CLIENTS)
@@ -108,6 +134,20 @@ bool comprobarConexiones(vector<struct jugadores> vjugadores, int id)
     return false;
 }
 
+
+/**
+ * @brief Intenta conectar a un usuario registrado en el sistema.
+ * Busca el nombre de usuario en el archivo "usuarios.txt".  
+ * Si lo encuentra, lo agrega al vector de jugadores y asigna sus datos iniciales.
+ * 
+ * @param vjugadores Vector de jugadores conectados.
+ * @param id Identificador del socket del cliente.
+ * @param jugador Nombre de usuario que intenta conectarse.
+ * @return 1 Si el usuario se ha conectado correctamente.  
+ * @return 2 Si el usuario no existe en el fichero.  
+ * @return 3 Si no hay espacio disponible en el vector.  
+ * @return 4 Si el usuario ya estaba conectado.  
+ */
 int IntroducirUsuarioRegistrado(vector<struct jugadores> &vjugadores, int id, const char *jugador)
 {
 
@@ -164,6 +204,16 @@ int IntroducirUsuarioRegistrado(vector<struct jugadores> &vjugadores, int id, co
     }
 }
 
+
+/**
+ * @brief Comprueba si la contraseña introducida por un jugador es correcta.
+ * 
+ * @param vjugadores Vector con los jugadores conectados.
+ * @param id Identificador del socket del cliente.
+ * @param contrasena Contraseña introducida por el usuario.
+ * @return true Si la contraseña coincide con la almacenada.  
+ * @return false En caso contrario.
+ */
 bool IntroducirContraseña(vector<struct jugadores> &vjugadores, int id, const char *contrasena)
 {
     for (int i = 0; i < vjugadores.size(); i++)
@@ -180,6 +230,15 @@ bool IntroducirContraseña(vector<struct jugadores> &vjugadores, int id, const c
     return false;
 }
 
+/**
+ * @brief Registra un nuevo jugador en el fichero "usuarios.txt".
+ * Verifica si el usuario ya existe. Si no, lo añade con su contraseña.
+ * 
+ * @param jugador Nombre de usuario a registrar.
+ * @param contrasena Contraseña del nuevo usuario.
+ * @return true Si el registro fue exitoso.  
+ * @return false Si el usuario ya existe o hay un error de archivo.
+ */
 bool RegistrarJugadorFichero(char *jugador, char *contrasena)
 {
     FILE *fichero;
@@ -240,8 +299,14 @@ bool RegistrarJugadorFichero(char *jugador, char *contrasena)
     return true;
 }
 
-
-void eliminaJugadoresPartida(vector<struct jugadores> &vjugadores, int id1, int id2, vector<struct partidas> &vpartidas)
+/**
+ * @brief Elimina del sistema la partida asociada a dos jugaodres.
+ * 
+ * @param id1 Identificador del primer jugador.
+ * @param id2 Identificador del segundo jugador.
+ * @param vpartidas Vector de partidas activas.
+ */
+void eliminaJugadoresPartida(int id1, int id2, vector<struct partidas> &vpartidas)
 {
     for (int i = 0; i < vpartidas.size(); i++)
     {
@@ -253,21 +318,53 @@ void eliminaJugadoresPartida(vector<struct jugadores> &vjugadores, int id1, int 
             vpartidas.erase(vpartidas.begin() + i); // Eliminamos la partida
         }
     }
+}
 
-    // Eliminar a ambos jugadores del vector de jugadores
-    for (int i = 0; i < vjugadores.size();)
+/**
+ * @brief Elimina completamente a un jugador del sistema y de cualquier partida activa.
+ * 
+ * @param vjugadores Vector de jugadores conectados.
+ * @param id Identificador del jugador a eliminar.
+ * @param vpartidas Vector de partidas activas.
+ */
+void eliminaJugador(vector<struct jugadores> &vjugadores, int id, vector<struct partidas> &vpartidas)
+{
+    // Elimino el vector de la partida
+    for (int i = 0; i < vpartidas.size(); i++)
     {
-        if (vjugadores[i].identificadorUsuario == id1 || vjugadores[i].identificadorUsuario == id2)
+        if (vpartidas[i].jugador1.identificadorUsuario == id)
         {
-            vjugadores.erase(vjugadores.begin() + i); // Eliminar el jugador
+            vpartidas.erase(vpartidas.begin() + i);
         }
-        else
+
+        if (vpartidas[i].jugador2.identificadorUsuario == id)
         {
-            i++; // Incrementar si no se ha eliminado un jugador del vector
+            vpartidas.erase(vpartidas.begin() + i);
+        }
+    }
+
+    // Elimino al jugador del vector jugadores
+    for (int i = 0; i < vjugadores.size(); i++)
+    {
+        if (vjugadores[i].identificadorUsuario == id)
+        {
+            vjugadores.erase(vjugadores.begin() + i);
         }
     }
 }
 
+/**
+ * @brief Asigna un jugador a una partida disponible o crea una nueva si no hay.
+ * 
+ * @param vjugadores Vector con todos los jugadores.
+ * @param id Identificador del jugador que busca partida.
+ * @param vpartidas Vector de partidas actuales.
+ * @param id2 Puntero que recibe el ID del oponente si se encuentra.
+ * @param obj Valor objetivo (puntos a alcanzar en la partida).
+ * @return 1 Si se empareja con otro jugador.  
+ * @return 2 Si se crea una nueva partida a la espera de oponente.  
+ * @return 0 Si no se puede crear o unir a ninguna partida.
+ */
 int meterJugadorEnPartida(vector<struct jugadores> &vjugadores, int id, vector<struct partidas> &vpartidas, int *id2, int obj)
 {
     // Comprueba si hay un jugador esperando emparejamiento
@@ -290,6 +387,7 @@ int meterJugadorEnPartida(vector<struct jugadores> &vjugadores, int id, vector<s
                     vpartidas[i].jugador2.turno = false;
                     vpartidas[i].objetivo = obj;
 
+                   
 
 
                     // Cambiar el estado a jugando (4) del jugador 1
@@ -297,12 +395,19 @@ int meterJugadorEnPartida(vector<struct jugadores> &vjugadores, int id, vector<s
                     {
                         if (vjugadores[j2].identificadorUsuario == vpartidas[i].jugador1.identificadorUsuario)
                         {
+                            vjugadores[j2].puntos = 0;
+                            vjugadores[j2].plantado = false;
                             vjugadores[j2].estado = 4;
+                            vjugadores[j2].contadorNoTirarDados = 0;
                             (*id2) = vjugadores[j2].identificadorUsuario;
                         }
                     }
 
                     // Cambiar el estado a jugando (4) y el identificador de la partida del jugador 2
+                    vjugadores[j].puntos = 0;
+                    vjugadores[j].plantado = false;
+                    vjugadores[j].turno = false;
+                    vjugadores[j].contadorNoTirarDados = 0;
                     vjugadores[j].estado = 4;
                     vjugadores[j].identificadorPartida = i;
                     return 1;
@@ -333,51 +438,25 @@ int meterJugadorEnPartida(vector<struct jugadores> &vjugadores, int id, vector<s
 }
 
 
-void eliminaJugador(vector<struct jugadores> &vjugadores, int id, vector<struct partidas> &vpartidas)
-{
-    // Elimino el vector de la partida
-    for (int i = 0; i < vpartidas.size(); i++)
-    {
-        if (vpartidas[i].jugador1.identificadorUsuario == id)
-        {
-            vpartidas.erase(vpartidas.begin() + i);
-        }
 
-        if (vpartidas[i].jugador2.identificadorUsuario == id)
-        {
-            vpartidas.erase(vpartidas.begin() + i);
-        }
-    }
-
-    // Elimino al jugador del vector jugadores
-    for (int i = 0; i < vjugadores.size(); i++)
-    {
-        if (vjugadores[i].identificadorUsuario == id)
-        {
-            vjugadores.erase(vjugadores.begin() + i);
-        }
-    }
-}
-
+/**
+ * @brief Simula el lanzamiento de un dado.
+ * 
+ * @return int Número aleatorio entre 1 y 6.
+ */
 int tirarDados(){
 
     return 1 + rand() % 6;
 
 }
 
-void imprimirVariable(jugadores jugador){
-    printf("Usuario: %s\n", jugador.usuario.c_str());
-    printf("Contraseña: %s\n", jugador.contraseña.c_str());
-    printf("Turno: %s\n", jugador.turno ? "true" : "false");
-    printf("Estado: %d\n", jugador.estado);
-    printf("Puntos: %d\n", jugador.puntos);
-    printf("Contador de no tirar dados: %d\n", jugador.contadorNoTirarDados);
-    printf("Plantado: %s\n", jugador.plantado ? "true" : "false");
-    printf("Identificador de la partida: %d\n", jugador.identificadorPartida);
-    printf("Identificador del usuario: %d\n", jugador.identificadorUsuario);
-
-}
-
+/**
+ * @brief Genera una representación en texto de la tabla de resultados entre dos jugadores.
+ * 
+ * @param j1 Puntuación del jugador 1.
+ * @param j2 Puntuación del jugador 2.
+ * @return string Cadena con formato de tabla mostrando ambos puntajes.
+ */
 string tablaResultado(int j1, int j2) {
 
     ostringstream oss;

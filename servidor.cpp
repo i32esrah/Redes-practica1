@@ -12,9 +12,7 @@
 #include <arpa/inet.h>
 #include "servidor.hpp"
 
-/** 
-   El servidor ofrece el servicio de un chat
- */
+
 
 void manejador(int signum);
 void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClientes[]);
@@ -78,7 +76,7 @@ int main ( )
 
 	if (bind (sd, (struct sockaddr *) &sockname, sizeof (sockname)) == -1)
 	{
-		perror("Error en la operación bind");
+		perror("Error en la operación bind\n");
 		exit(1);
 	}
 	
@@ -92,7 +90,7 @@ int main ( )
 
 
 	if(listen(sd,1) == -1){
-		perror("Error en la operación de listen");
+		perror("Error en la operación de listen\n");
 		exit(1);
 	}
 
@@ -129,7 +127,7 @@ int main ( )
                         if( i == sd){
                             
                             if((new_sd = accept(sd, (struct sockaddr *)&from, &from_len)) == -1){
-                                perror("Error aceptando peticiones");
+                                perror("Error aceptando peticiones\n");
                             }
                             else
                             {
@@ -168,7 +166,7 @@ int main ( )
                             bzero(buffer, sizeof(buffer));
                             fgets(buffer, sizeof(buffer),stdin);
                             
-                            //Controlar si se ha introducido "SALIR", cerrando todos los sockets y finalmente saliendo del servidor. (implementar)
+                            //Controlar si se ha introducido "SALIR", cerrando todos los sockets y finalmente saliendo del servidor.
                             if(strcmp(buffer,"SALIR\n") == 0){
 
                                 bzero(buffer, sizeof(buffer));
@@ -186,7 +184,7 @@ int main ( )
                                 
                                 
                             }
-                            //Mensajes que se quieran mandar a los clientes (implementar)
+                            //Mensajes que se quieran mandar a los clientes
                             
                         } 
                         else{
@@ -233,7 +231,7 @@ int main ( )
                                         send(idJugador2, buffer, sizeof(buffer), 0);
 
                                         // Saca a los jugadores de la partida.
-                                        eliminaJugadoresPartida(vjugadores, i, idJugador2, vpartidas);
+                                        eliminaJugadoresPartida(i, idJugador2, vpartidas);
                                     } else if ( estadoJugador == 3 ) {
 
                                         eliminaJugador(vjugadores, i, vpartidas);
@@ -259,18 +257,18 @@ int main ( )
                                     } else if( introducirRes == 2 ) {
                                         
                                         bzero(buffer, sizeof(buffer));
-                                        sprintf(buffer, "-ERR. USUARIO incorrecto.");
+                                        sprintf(buffer, "-ERR. USUARIO incorrecto.\n");
                                         send(i, buffer, sizeof(buffer), 0);
 
                                     } else if( introducirRes == 3 ) {
 
                                         bzero(buffer, sizeof(buffer));
-                                        sprintf(buffer, "-ERR. Demasiados clientes conectados.");
+                                        sprintf(buffer, "-ERR. Demasiados clientes conectados.\n");
                                         send(i, buffer, sizeof(buffer), 0);
 
                                     } else if( introducirRes == 4 ) {
                                         bzero(buffer, sizeof(buffer));
-                                        sprintf(buffer, "-ERR. Este usuario ya está logueado.");
+                                        sprintf(buffer, "-ERR. Este usuario ya está logueado.\n");
                                         send(i, buffer, sizeof(buffer), 0);
                                     }
 
@@ -351,19 +349,19 @@ int main ( )
                                         } else if(res == 2) {
                                             
                                             bzero(buffer, sizeof(buffer));
-                                            sprintf(buffer, "+Ok. Esperando otro jugador");
+                                            sprintf(buffer, "+Ok. Esperando otro jugador.\n");
                                             send(i, buffer, sizeof(buffer), 0);
                                         } else if(res == 0) {
 
                                             printf("Cliente <%d> ha dejado de buscar partida. Se ha alcanzado el máximo de clientes jugando simultáneamente.\n", i);
 
                                             bzero(buffer, sizeof(buffer));
-                                            sprintf(buffer, "-ERR. Demasiados clientes jugando al BlackJack.");
+                                            sprintf(buffer, "-ERR. Demasiados clientes jugando.\n");
                                             send(i, buffer, sizeof(buffer), 0);
                                         }
                                     } else if (!conectado) {
                                         bzero(buffer, sizeof(buffer));
-                                        sprintf(buffer, "-ERR. No puedes iniciar partida sin antes loguearte.");
+                                        sprintf(buffer, "-ERR. No puedes iniciar partida sin antes loguearte.\n");
                                         send(i, buffer, sizeof(buffer), 0);
                                     }
                                 } else if( strncmp(buffer, "TIRAR-DADOS", strlen("TIRAR-DADOS")) == 0 ){
@@ -486,7 +484,7 @@ int main ( )
                                                                             } else {
                                                                                 
                                                                                 bzero(buffer, sizeof(buffer));
-                                                                                sprintf(buffer, "+Ok. Es tu turno, el jugador contrario está plantado.");
+                                                                                sprintf(buffer, "+Ok. Es tu turno, el jugador contrario está plantado.\n");
                                                                                 send(i, buffer, sizeof(buffer), 0);
                                                                             }
                                                                         }
@@ -503,11 +501,11 @@ int main ( )
                                                                     vjugadores[l].puntos = puntosJugador;
 
                                                                     bzero(buffer, sizeof(buffer));
-                                                                    sprintf(buffer, "+Ok.[<DADO 1>, <%d>; <PUNTUACIÓN TOTAL>, <%d>]", n1, puntosJugador);
+                                                                    sprintf(buffer, "+Ok.[<DADO 1>, <%d>; <PUNTUACIÓN TOTAL>, <%d>]\n", n1, puntosJugador);
                                                                     send(i, buffer, sizeof(buffer), 0);
 
                                                                     bzero(buffer, sizeof(buffer));
-                                                                    sprintf(buffer, "+Ok.[<TIRADA DEL RIVAL>: <DADO 1>, <%d>]", n1);
+                                                                    sprintf(buffer, "+Ok.[<TIRADA DEL RIVAL>: <DADO 1>, <%d>]\n", n1);
                                                                     send(idJugador2, buffer, sizeof(buffer), 0);
 
                                                                     if(!plantadoJugador2){
@@ -531,12 +529,12 @@ int main ( )
                                                                                 vjugadores[a].turno = true;
                                                                                 
                                                                                 bzero(buffer, sizeof(buffer));
-                                                                                sprintf(buffer, "+Ok. Es tu turno.");
+                                                                                sprintf(buffer, "+Ok. Es tu turno.\n");
                                                                                 send(idJugador2, buffer, sizeof(buffer), 0);
                                                                             } else {
                                                                                 
                                                                                 bzero(buffer, sizeof(buffer));
-                                                                                sprintf(buffer, "+Ok. Es tu turno, el jugador contrario está plantado.");
+                                                                                sprintf(buffer, "+Ok. Es tu turno, el jugador contrario está plantado.\n");
                                                                                 send(i, buffer, sizeof(buffer), 0);
                                                                             }
                                                                         }
@@ -544,18 +542,18 @@ int main ( )
 
                                                                 } else {
                                                                     bzero(buffer, sizeof(buffer));
-                                                                    sprintf(buffer, "-Err. El usuario puede tirar 1 o 2 dados.");
+                                                                    sprintf(buffer, "-Err. El usuario puede tirar 1 o 2 dados.\n");
                                                                     send(i, buffer, sizeof(buffer), 0);
                                                                 }
 
                                                             } else if(puntosJugador > objetivo) {
                                                                 bzero(buffer, sizeof(buffer));
-                                                                sprintf(buffer, "-ERR. Excedido el valor de %d. Solo puedes plantarte", objetivo);
+                                                                sprintf(buffer, "-ERR. Excedido el valor de %d. Solo puedes plantarte\n", objetivo);
                                                                 send(i, buffer, sizeof(buffer), 0);
 
                                                             } else {
                                                                 bzero(buffer, sizeof(buffer));
-                                                                sprintf(buffer, "-ERR. No puedes tirar más dados, ya que tu suma es igual a %d.", objetivo);
+                                                                sprintf(buffer, "-ERR. No puedes tirar más dados, ya que tu suma es igual a %d.\n", objetivo);
                                                                 send(i, buffer, sizeof(buffer), 0);
                                                             }
                                                         }
@@ -563,23 +561,23 @@ int main ( )
                                                 } else { // No es el turno de este jugador
 
                                                     bzero(buffer, sizeof(buffer));
-                                                    sprintf(buffer, "-ERR. Turno del jugador contrario. Espera al otro jugador.");
+                                                    sprintf(buffer, "-ERR. Turno del jugador contrario. Espera al otro jugador.\n");
                                                     send(i, buffer, sizeof(buffer), 0);
                                                 }
                                             } else { // Este jugador se ha plantado
                                                 bzero(buffer, sizeof(buffer));
-                                                sprintf(buffer, "-ERR. No puedes tirar dados. Te has plantado.");
+                                                sprintf(buffer, "-ERR. No puedes tirar dados. Te has plantado.\n");
                                                 send(i, buffer, sizeof(buffer), 0);
                                             }
                                         } else { // El jugador no está en una partida
                                             bzero(buffer, sizeof(buffer));
-                                            sprintf(buffer, "-ERR. No puedes tirar dados fuera de una partida.");
+                                            sprintf(buffer, "-ERR. No puedes tirar dados fuera de una partida.\n");
                                             send(i, buffer, sizeof(buffer), 0);
                                         }
                                     } else { // Jugador no logueado
 
                                         bzero(buffer, sizeof(buffer));
-                                        sprintf(buffer, "-ERR. No puedes tirar dados sin antes loguearte.");
+                                        sprintf(buffer, "-ERR. No puedes tirar dados sin antes loguearte.\n");
                                         send(i, buffer, sizeof(buffer), 0);
                                     }
 
@@ -734,7 +732,7 @@ int main ( )
                                                     vjugadores[a].turno = false;
 
                                                     bzero(buffer, sizeof(buffer));
-                                                    sprintf(buffer, "+Ok. Te has plantado.");
+                                                    sprintf(buffer, "+Ok. Te has plantado.\n");
                                                     send(i, buffer, sizeof(buffer), 0);
                                             
                                                 }
@@ -755,7 +753,7 @@ int main ( )
 
                                             if (aux == 1) { // Solo se ha plantado 1 jugador
                                                 bzero(buffer, sizeof(buffer));
-                                                sprintf(buffer, "+Ok. Esperando que finalice el otro jugador");
+                                                sprintf(buffer, "+Ok. Esperando que finalice el otro jugador.\n");
                                                 send(i, buffer, sizeof(buffer), 0);
                                             } else if (aux == 2) {
                                                 int puntosJugador1 = 0, puntosJugador2 = 0;
@@ -786,7 +784,7 @@ int main ( )
 
 
                                                     bzero(buffer, sizeof(buffer));
-                                                    sprintf(buffer, "+Ok. Jugador %s y Jugador %s habéis empatado la partida", usuario1.c_str(), usuario2.c_str());
+                                                    sprintf(buffer, "+Ok. Jugador %s y Jugador %s habéis empatado la partida.\n", usuario1.c_str(), usuario2.c_str());
                                                     send(i, buffer, sizeof(buffer), 0);
                                                     send(idJugador2, buffer, sizeof(buffer), 0);
                                                 }
@@ -802,10 +800,10 @@ int main ( )
                                                     send(idJugador2, buffer, sizeof(buffer), 0);
 
                                                     bzero(buffer, sizeof(buffer));
-                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida", usuario2.c_str());
+                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida.\n", usuario2.c_str());
                                                     send(i, buffer, sizeof(buffer), 0);
                                                     bzero(buffer, sizeof(buffer));
-                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida", usuario2.c_str());
+                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida.\n", usuario2.c_str());
                                                     send(idJugador2, buffer, sizeof(buffer), 0);
                                                 }
                                                 // Jugador 1 ha ganado la partida
@@ -820,10 +818,10 @@ int main ( )
                                                     send(idJugador2, buffer, sizeof(buffer), 0);
 
                                                     bzero(buffer, sizeof(buffer));
-                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida", usuario1.c_str());
+                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida.\n", usuario1.c_str());
                                                     send(i, buffer, sizeof(buffer), 0);
                                                     bzero(buffer, sizeof(buffer));
-                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida", usuario1.c_str());
+                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida.\n", usuario1.c_str());
                                                     send(idJugador2, buffer, sizeof(buffer), 0);
                                                 }
                                                 // Jugador 2 ha superado el objetivo
@@ -838,10 +836,10 @@ int main ( )
                                                     send(idJugador2, buffer, sizeof(buffer), 0);
 
                                                     bzero(buffer, sizeof(buffer));
-                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida", usuario1.c_str());
+                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida.\n", usuario1.c_str());
                                                     send(i, buffer, sizeof(buffer), 0);
                                                     bzero(buffer, sizeof(buffer));
-                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida", usuario1.c_str());
+                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida.\n", usuario1.c_str());
                                                     send(idJugador2, buffer, sizeof(buffer), 0);
                                                 }
                                                 // Jugador 1 ha superado el objetivo
@@ -856,10 +854,10 @@ int main ( )
                                                     send(idJugador2, buffer, sizeof(buffer), 0);
 
                                                     bzero(buffer, sizeof(buffer));
-                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida", usuario2.c_str());
+                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida.\n", usuario2.c_str());
                                                     send(i, buffer, sizeof(buffer), 0);
                                                     bzero(buffer, sizeof(buffer));
-                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida", usuario2.c_str());
+                                                    sprintf(buffer, "+Ok. Jugador %s ha ganado la partida.\n", usuario2.c_str());
                                                     send(idJugador2, buffer, sizeof(buffer), 0);
                                                 }
                                                 // Ninguno ha ganado
@@ -874,30 +872,30 @@ int main ( )
                                                     send(idJugador2, buffer, sizeof(buffer), 0);
 
                                                     bzero(buffer, sizeof(buffer));
-                                                    sprintf(buffer, "+Ok. No hay ganadores");
+                                                    sprintf(buffer, "+Ok. No hay ganadores.\n");
                                                     send(i, buffer, sizeof(buffer), 0);
                                                     bzero(buffer, sizeof(buffer));
-                                                    sprintf(buffer, "+Ok. No hay ganadores");
+                                                    sprintf(buffer, "+Ok. No hay ganadores.\n");
                                                     send(idJugador2, buffer, sizeof(buffer), 0);
                                                 }
 
                                                 // Elimina a ambos jugadores de la partida
-                                                eliminaJugadoresPartida(vjugadores, i, idJugador2, vpartidas);
+                                                eliminaJugadoresPartida(i, idJugador2, vpartidas);
                                             }
                                         } else { // El jugador no está en partida
                                             bzero(buffer, sizeof(buffer));
-                                            sprintf(buffer, "-ERR. No puedes plantarte sin antes iniciar partida.");
+                                            sprintf(buffer, "-ERR. No puedes plantarte sin antes iniciar partida.\n");
                                             send(i, buffer, sizeof(buffer), 0);
                                         }
                                     } else { // El Jugador no está logueado
                                         bzero(buffer, sizeof(buffer));
-                                        sprintf(buffer, "-ERR. No puedes plantarte sin antes iniciar partida.");
+                                        sprintf(buffer, "-ERR. No puedes plantarte sin antes iniciar partida.\n");
                                         send(i, buffer, sizeof(buffer), 0);
                                     }
 
                                 } else {
                                     bzero(buffer, sizeof(buffer));
-                                    sprintf(buffer, "-ERR. No se permite enviar este mensaje");
+                                    sprintf(buffer, "-ERR. No se permite enviar este mensaje.\n");
                                     send(i, buffer, sizeof(buffer), 0);
                                 }
                                                                 
@@ -931,11 +929,11 @@ int main ( )
                                     }
                                     // Avisa al otro jugador de que se ha salido de la partida
                                     bzero(buffer, sizeof(buffer));
-                                    sprintf(buffer, "+Ok. Tu oponente ha terminado la partida");
+                                    sprintf(buffer, "+Ok. Tu oponente ha terminado la partida.\n");
                                     send(idJugador2, buffer, sizeof(buffer), 0);
 
                                     // Elimina a ambos jugadores de la partida
-                                    eliminaJugadoresPartida(vjugadores, i, idJugador2, vpartidas);
+                                    eliminaJugadoresPartida(i, idJugador2, vpartidas);
                                 }
                                 else if (estadoJugador == 3)
                                 {
