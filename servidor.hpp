@@ -457,11 +457,11 @@ int tirarDados(){
  * @param j2 Puntuación del jugador 2.
  * @return string Cadena con formato de tabla mostrando ambos puntajes.
  */
-string tablaResultado(int j1, int j2) {
+string tablaResultado(int j1, int j2, string usuario1, string usuario2) {
 
     ostringstream oss;
 
-    oss << "-------------------------------------------------\n|\tJUGADOR 1	|\tJUGADOR 2\t|\n-------------------------------------------------\n|                       |                       |\n|         "<< j1 <<"            |           "<< j2 <<"          |";
+    oss << "-------------------------------------------------\n|\t"+ usuario1 +" 	|\t"+ usuario2 +" \t|\n-------------------------------------------------\n|                       |                       |\n|         "<< j1 <<"            |           "<< j2 <<"          |";
 
     string res = oss.str();
     return res;
