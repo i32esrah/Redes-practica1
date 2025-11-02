@@ -19,13 +19,13 @@ using namespace std;
 /**
  * @brief Define el tamaño máximo de línea.
  */
-#define MSG_SIZE 250
+#define MSG_SIZE 200
 
 
 /**
  * @brief Define el puerto del servidor.
  */
-#define PORT 2000
+#define PORT 1865
 
 /**
  * @struct jugadores
@@ -461,8 +461,7 @@ string tablaResultado(int j1, int j2, string usuario1, string usuario2) {
 
     ostringstream oss;
 
-    oss << "-------------------------------------------------\n|\t"+ usuario1 +" 	|\t"+ usuario2 +" \t|\n-------------------------------------------------\n|                       |                       |\n|         "<< j1 <<"            |           "<< j2 <<"          |";
-
+    oss << "+-------------------------------+\n" << "| " << usuario1 << "\t| " << usuario2 << "\t|\n" << "+-------------------------------+\n" << "| " << j1 << "\t\t| " << j2 << "\t\t|\n" << "+-------------------------------+";;
     string res = oss.str();
     return res;
 }

@@ -15,7 +15,7 @@
 
 
 void manejador(int signum);
-void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClientes[]);
+void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClientes[], vector<struct jugadores> &vjugadores, vector<struct partidas> &vpartidas);
 
 
 
@@ -143,7 +143,7 @@ int main ( )
                                     send(new_sd, buffer, sizeof(buffer), 0);
 
                                     bzero(buffer, sizeof(buffer));
-                                    sprintf(buffer, "------------------ OPCIONES ------------------\nUSUARIO usuario\nPASSWORD contraseña\nREGISTRO -u usuario -p contraseña\nINICIAR-PARTIDA\nTIRAR-DADOS\nNO-TIRAR-DADOS\nPLANTARME\nSALIR\n----------------------------------------------\n");
+                                    sprintf(buffer, "----------- OPCIONES -----------\nUSUARIO usuario\nPASSWORD contraseña\nREGISTRO -u usuario -p contraseña\nINICIAR-PARTIDA\nTIRAR-DADOS\nNO-TIRAR-DADOS\nPLANTARME\nSALIR\n--------------------------------\n");
                                     send(new_sd, buffer, sizeof(buffer), 0);
                                 }
                                 else
@@ -175,7 +175,7 @@ int main ( )
                                 for (j = 0; j < numClientes; j++){
 						            
                                     send(arrayClientes[j],buffer , sizeof(buffer),0);
-                                    salirCliente(arrayClientes[j], &readfds, &numClientes, arrayClientes);
+                                    salirCliente(arrayClientes[j], &readfds, &numClientes, arrayClientes, vjugadores, vpartidas);
                                 }
                                 
                                 printf("Servidor apagado.\n");
@@ -198,52 +198,12 @@ int main ( )
                                 
                                 if(strcmp(buffer,"SALIR\n") == 0){
 
-
-                                    int estadoJugador = 0;
-
-                                    for(int j = 0; j < vjugadores.size(); j++) {
-                                        
-                                        if(vjugadores[j].identificadorUsuario == i) {
-                                            estadoJugador = vjugadores[j].estado;
-                                        
-                                        }
-                                    }
-
-                                    if(estadoJugador == 4) {
-
-                                        int idJugador2 = 0;
-
-                                        for(int j = 0; j < vpartidas.size(); j++) {
-                                            if( vpartidas[j].jugador1.identificadorUsuario == i ){
-
-                                                idJugador2 = vpartidas[j].jugador2.identificadorUsuario;
-
-                                            } else if( vpartidas[j].jugador2.identificadorUsuario == i ) {
-
-                                                idJugador2 = vpartidas[j].jugador1.identificadorUsuario;
-
-                                            }
-                                        }
-
-                                        // Alerta al otro usuario de que su rival ha abandonado la partida.
-                                        bzero(buffer, sizeof(buffer));
-                                        sprintf(buffer, "+Ok. Tu oponente ha terminado la partida\n");
-                                        send(idJugador2, buffer, sizeof(buffer), 0);
-
-                                        // Saca a los jugadores de la partida.
-                                        eliminaJugadoresPartida(i, idJugador2, vpartidas);
-                                    } else if ( estadoJugador == 3 ) {
-
-                                        eliminaJugador(vjugadores, i, vpartidas);
-
-                                    }
-
-                                    salirCliente(i, &readfds, &numClientes, arrayClientes);
+                                    salirCliente(i, &readfds, &numClientes, arrayClientes, vjugadores, vpartidas);
                                     
                                 } else if(strncmp(buffer, "USUARIO ", strlen("USUARIO ")) == 0 ) {
 
                                     //Obtenemos el nombre del usuario
-                                    char jugador[250];
+                                    char jugador[MSG_SIZE];
                                     sscanf(buffer, "USUARIO %s", jugador);
                                     int introducirRes = IntroducirUsuarioRegistrado(vjugadores, i, jugador);
 
@@ -274,7 +234,7 @@ int main ( )
 
                                 } else if(strncmp(buffer, "PASSWORD ", strlen("PASSWORD ")) == 0){
                                     
-                                    char contraseña[250];
+                                    char contraseña[MSG_SIZE];
                                     sscanf(buffer, "PASSWORD %s", contraseña);
 
                                     if( IntroducirContraseña(vjugadores, i, contraseña) == true ){ //Contraseña
@@ -291,8 +251,8 @@ int main ( )
                                 
                                 } else if(strncmp(buffer, "REGISTRO ", strlen("REGISTRO ")) == 0) {
 
-                                    char contrasena[250];
-                                    char usuario[250];
+                                    char contrasena[MSG_SIZE];
+                                    char usuario[MSG_SIZE];
                                     sscanf(buffer, "REGISTRO -u %s -p %s", usuario, contrasena);
 
                                     if( RegistrarJugadorFichero(usuario, contrasena) == true ){ //El usuario fue registrado
@@ -773,7 +733,7 @@ int main ( )
                                                 }
 
                                                 bzero(buffer, sizeof(buffer));
-                                                sprintf(buffer, "------------------- OBJETIVO: %d ------------------\n", objetivo);
+                                                sprintf(buffer, "--------- OBJETIVO: %d ---------\n", objetivo);
                                                 send(i, buffer, sizeof(buffer), 0);
                                                 send(idJugador2, buffer, sizeof(buffer), 0);
 
@@ -889,7 +849,7 @@ int main ( )
                                                 eliminaJugadoresPartida(i, idJugador2, vpartidas);
                                                 
                                                 bzero(buffer, sizeof(buffer));
-                                                sprintf(buffer, "------------------ OPCIONES ------------------\nUSUARIO usuario\nPASSWORD contraseña\nREGISTRO -u usuario -p contraseña\nINICIAR-PARTIDA\nTIRAR-DADOS\nNO-TIRAR-DADOS\nPLANTARME\nSALIR\n----------------------------------------------\n");
+                                                sprintf(buffer, "----------- OPCIONES -----------\nUSUARIO usuario\nPASSWORD contraseña\nREGISTRO -u usuario -p contraseña\nINICIAR-PARTIDA\nTIRAR-DADOS\nNO-TIRAR-DADOS\nPLANTARME\nSALIR\n--------------------------------\n");
                                                 send(i, buffer, sizeof(buffer), 0);
                                                 send(idJugador2, buffer, sizeof(buffer), 0);
                                             }
@@ -952,7 +912,7 @@ int main ( )
                                     eliminaJugador(vjugadores, i, vpartidas);
                                 }
 
-                                salirCliente(i, &readfds, &numClientes, arrayClientes);
+                                salirCliente(i, &readfds, &numClientes, arrayClientes, vjugadores, vpartidas);
                             }
                         }
                     }
@@ -965,23 +925,91 @@ int main ( )
 	
 }
 
-void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClientes[]){
-  
+void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClientes[], vector<struct jugadores> &vjugadores, vector<struct partidas> &vpartidas){
     printf("Socket de cliente <%d> desconectado.\n", socket);
-
-    char buffer[250];
-    int j;
     
-    close(socket);
-    FD_CLR(socket,readfds);
-    
-    //Re-estructurar el array de clientes
-    for (j = 0; j < (*numClientes) - 1; j++)
-        if (arrayClientes[j] == socket)
+    // Verificar estado del jugador
+    int estadoJugador = 0;
+    string usuario;
+    for(int j = 0; j < vjugadores.size(); j++) {
+        if(vjugadores[j].identificadorUsuario == socket) {
+            estadoJugador = vjugadores[j].estado;
+            usuario = vjugadores[j].usuario;
             break;
-    for (; j < (*numClientes) - 1; j++)
-        (arrayClientes[j] = arrayClientes[j+1]);
+        }
+    }
     
-    (*numClientes)--;
-
+    // Si está en partida, manejar la desconexión
+    if(estadoJugador == 4) { // En partida
+        int idJugador2 = 0;
+        for(int h = 0; h < vpartidas.size(); h++) {
+            if(vpartidas[h].jugador1.identificadorUsuario == socket) {
+                idJugador2 = vpartidas[h].jugador2.identificadorUsuario;
+                
+                // Avisar al otro jugador
+                char buffer[MSG_SIZE];
+                bzero(buffer, sizeof(buffer));
+                sprintf(buffer, "+Ok. Tu oponente (%s) ha abandonado la partida.\n", usuario.c_str());
+                send(idJugador2, buffer, sizeof(buffer), 0);
+                
+                // Mostrar opciones al jugador que se queda
+                bzero(buffer, sizeof(buffer));
+                sprintf(buffer, "----------- OPCIONES -----------\nUSUARIO usuario\nPASSWORD contraseña\nREGISTRO -u usuario -p contraseña\nINICIAR-PARTIDA\nTIRAR-DADOS\nNO-TIRAR-DADOS\nPLANTARME\nSALIR\n--------------------------------\n");
+                send(idJugador2, buffer, sizeof(buffer), 0);
+                
+                // Eliminar partida
+                eliminaJugadoresPartida(socket, idJugador2, vpartidas);
+                break;
+                
+            } else if(vpartidas[h].jugador2.identificadorUsuario == socket) {
+                idJugador2 = vpartidas[h].jugador1.identificadorUsuario;
+                
+                // Avisar al otro jugador
+                char buffer[MSG_SIZE];
+                bzero(buffer, sizeof(buffer));
+                sprintf(buffer, "+Ok. Tu oponente (%s) ha abandonado la partida.\n", usuario.c_str());
+                send(idJugador2, buffer, sizeof(buffer), 0);
+                
+                // Mostrar opciones al jugador que se queda
+                bzero(buffer, sizeof(buffer));
+                sprintf(buffer, "----------- OPCIONES -----------\nUSUARIO usuario\nPASSWORD contraseña\nREGISTRO -u usuario -p contraseña\nINICIAR-PARTIDA\nTIRAR-DADOS\nNO-TIRAR-DADOS\nPLANTARME\nSALIR\n--------------------------------\n");
+                send(idJugador2, buffer, sizeof(buffer), 0);
+                
+                // Eliminar partida
+                eliminaJugadoresPartida(socket, idJugador2, vpartidas);
+                break;
+            }
+        }
+    }
+    // Si está en espera (estado 3), eliminarlo de la lista de espera
+    else if(estadoJugador == 3) {
+        eliminaJugador(vjugadores, socket, vpartidas);
+    }
+    
+    // Eliminar completamente del vector de jugadores
+    for(int j = 0; j < vjugadores.size(); j++) {
+        if(vjugadores[j].identificadorUsuario == socket) {
+            printf("Eliminando jugador '%s' del vector vjugadores\n", vjugadores[j].usuario.c_str());
+            vjugadores.erase(vjugadores.begin() + j);
+            break;
+        }
+    }
+    
+    // Cerrar conexión y limpiar arrays de conexiones
+    close(socket);
+    FD_CLR(socket, readfds);
+    
+    // Re-estructurar el array de clientes
+    int j;
+    for(j = 0; j < (*numClientes); j++) {
+        if(arrayClientes[j] == socket) {
+            break;
+        }
+    }
+    if(j < (*numClientes)) {
+        for(; j < (*numClientes) - 1; j++) {
+            arrayClientes[j] = arrayClientes[j+1];
+        }
+        (*numClientes)--;
+    }
 }
